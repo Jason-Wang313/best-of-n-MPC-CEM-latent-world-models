@@ -1,5 +1,9 @@
 # CEM as an Adaptive Model-Error Amplifier in Learned World-Model MPC
 
+Canonical paper draft: `../PAPER.md`.
+
+PDF copy: `../PAPER.pdf`.
+
 ## Abstract
 
 Planning with learned world models often optimizes imagined rollouts using random shooting, Best-of-N, or CEM. This paper studies a specific failure mode: CEM can adaptively amplify model optimism because each elite refit changes the proposal distribution toward trajectories selected by the learned model. In controlled worlds with known sparse error pockets, we measure proposal drift, elite model-error concentration, tail optimism, and closed-loop regret. We compare uncertainty pessimism, diversity floors, disagreement vetoes, pilot calibration, conservative temperatures, and shadow-realism scoring. The current evidence supports a mechanism claim and motivates benchmark-scale validation.

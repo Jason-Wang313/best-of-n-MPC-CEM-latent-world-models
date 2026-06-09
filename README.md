@@ -39,6 +39,15 @@ Outputs are written to `results/` and `figures/`. The smoke run is intentionally
 - `figures/smoke/regret_bars.png`
 - `figures/smoke/elite_refit_drift.png`
 
+## Paper Draft
+
+The paper draft is intentionally visible at the repo root:
+
+- `PAPER.md`
+- `PAPER.pdf`
+
+There is also a pointer in `paper/paper.md`.
+
 ## Repo Layout
 
 - `src/boncem/`: toy worlds, sparse learned ensemble, planners, scoring repairs, metrics.
