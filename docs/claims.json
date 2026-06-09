@@ -1,0 +1,38 @@
+{
+  "claims": [
+    {
+      "id": "adaptive_elite_refit_amplification",
+      "text": "CEM can concentrate future samples into model-error pockets because each refit conditions on model-scored elites.",
+      "status": "supported",
+      "evidence": [
+        "results/smoke/controlled_summary.json",
+        "results/smoke/controlled_traces.csv",
+        "figures/smoke/elite_refit_drift.png"
+      ]
+    },
+    {
+      "id": "cem_can_underperform_static_best_of_n",
+      "text": "In the controlled pocket world, vanilla CEM can produce worse true return than static non-adaptive proposals.",
+      "status": "partial",
+      "evidence": [
+        "results/smoke/controlled_rollouts.csv",
+        "figures/smoke/regret_bars.png"
+      ]
+    },
+    {
+      "id": "repairs_reduce_controlled_regret",
+      "text": "Model-only repair variants reduce controlled-world regret by penalizing or slowing concentration into uncertain/OOD elites.",
+      "status": "partial",
+      "evidence": [
+        "results/smoke/controlled_summary.json",
+        "figures/smoke/regret_bars.png"
+      ]
+    },
+    {
+      "id": "benchmark_scale_generalization",
+      "text": "The mechanism and repairs transfer to high-dimensional PlaNet/Dreamer-scale latent control benchmarks.",
+      "status": "unsupported",
+      "evidence": []
+    }
+  ]
+}

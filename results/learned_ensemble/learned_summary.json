@@ -1,0 +1,22 @@
+{
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "mean_regret_by_planner": {
+    "learned_cem_calibrated": 2.9645146065477843,
+    "learned_best_of_n": 3.1861549939601077,
+    "learned_cem_uncertainty": 3.3544816529563923,
+    "learned_cem": 4.6424933197453875
+  },
+  "mean_tail_gap_by_planner": {
+    "learned_best_of_n": -0.8944592356867828,
+    "learned_cem_calibrated": -0.1774157695285897,
+    "learned_cem_uncertainty": 0.2396680338484123,
+    "learned_cem": 1.5992938937319794
+  }
+}
