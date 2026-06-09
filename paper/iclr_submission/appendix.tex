@@ -1,0 +1,90 @@
+\section{Proof Details}
+\label{app:proof}
+
+The proposition uses an idealized conditional refit. Let $p_t=q_t(P=1)$ and write $L=L_t$. If the next proposal exactly sets its pocket mass to the elite conditional pocket mass, then
+\begin{align}
+q_{t+1}(P=1)
+&=\Pr(P=1\mid L=1)\\
+&=\frac{\Pr(L=1\mid P=1)\Pr(P=1)}{\Pr(L=1)}\\
+&=p_t\frac{\Pr(L=1\mid P=1)}{\rho}.
+\end{align}
+Therefore the multiplicative lift is $\Pr(L=1\mid P=1)/\rho$. Pocket mass increases exactly when the pocket is elite-enriched, i.e. $\Pr(L=1\mid P=1)>\rho$.
+
+For a moment-matched feature $\phi$ under an exact elite-conditional update,
+\begin{align}
+\mathbb{E}_{q_{t+1}}[\phi]-\mathbb{E}_{q_t}[\phi]
+&=\mathbb{E}_{q_t}[\phi\mid L=1]-\mathbb{E}_{q_t}[\phi]\\
+&=\frac{\mathbb{E}_{q_t}[\phi L]}{\rho}-\mathbb{E}_{q_t}[\phi]\\
+&=\frac{\mathbb{E}_{q_t}[\phi L]-\mathbb{E}_{q_t}[\phi]\mathbb{E}_{q_t}[L]}{\rho}\\
+&=\frac{\mathrm{Cov}_{q_t}(\phi,L)}{\rho}.
+\end{align}
+Diagonal Gaussian CEM does not represent arbitrary pocket indicators exactly. In the implemented planner, the practical analog is a finite-sample mean and variance update on elite action sequences. This is why the paper treats the identity as a diagnostic law rather than a regret theorem.
+
+\section{Experiment Settings}
+\label{app:settings}
+
+\paragraph{Controlled pocket world.}
+The full controlled run uses seeds $0$ through $11$, CEM population $256$, elite fraction $0.1$, $5$ CEM iterations, horizon $8$, action dimension $1$, action range $[-1,1]$, initial standard deviation $0.82$, minimum standard deviation $0.035$, and zero momentum. It compares random shooting, one-shot Best-of-$N$, equal-budget Best-of-$N$, vanilla CEM, uncertainty pessimism, elite diversity floor, model-disagreement veto, pilot-label calibration, conservative refit temperature, shadow-realism scoring, and combined repaired CEM.
+
+\paragraph{Sparse learned ensemble.}
+The learned-ensemble run uses six seeds and trains a small bootstrapped polynomial ensemble on sparse transition coverage around the harmful region. It compares vanilla learned CEM, calibrated learned CEM, uncertainty-penalized learned CEM, and learned Best-of-$N$. The result is intended to check whether the controlled mechanism appears when optimism comes from learned sparse-region bias.
+
+\paragraph{Sweeps and closed loop.}
+The sweep covers population in $\{96,192,384\}$, CEM iterations in $\{1,2,4,6\}$, elite fraction in $\{0.05,0.1,0.2\}$, and seeds $0$ through $4$, for 180 rows. Closed-loop evaluation executes the first action of the selected plan, observes the next state, and replans over a short horizon. The closed-loop result is reported as a small receding-horizon stress test, not as a global theorem.
+
+\section{Repair Definitions}
+\label{app:repairs}
+
+\paragraph{Uncertainty pessimism.}
+The score subtracts an ensemble-disagreement penalty. This directly targets optimistic candidates in regions where the learned ensemble disagrees.
+
+\paragraph{Model-disagreement veto.}
+Candidates above a disagreement quantile are removed before elite selection. This is stricter than pessimism and can block a high-scoring pocket candidate before it enters the elite set.
+
+\paragraph{Pilot-label calibration.}
+A small explicitly supplied pilot set with true labels fits an optimism penalty. This method spends real labels; the paper does not present it as label-free.
+
+\paragraph{Conservative refit temperature.}
+The refit keeps proposal variance from collapsing too quickly. This targets the adaptive-concentration mechanism rather than the score directly.
+
+\paragraph{Elite diversity floor.}
+The elite set is constrained so that near-duplicate candidates cannot monopolize the refit. The full run shows that this repair alone is not sufficient in the controlled pocket world.
+
+\paragraph{Shadow-realism scoring.}
+The score includes simple support proxies that penalize trajectories that look out-of-support. This is a mechanism probe for OOD elite concentration.
+
+\section{Artifact Map}
+\label{app:artifact-map}
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+Purpose & Repo-relative artifact \\
+\midrule
+Controlled summary numbers & \path{results/controlled/controlled_summary.json} \\
+Controlled rollouts & \path{results/controlled/controlled_rollouts.csv} \\
+Controlled CEM traces & \path{results/controlled/controlled_traces.csv} \\
+Closed-loop returns & \path{results/controlled/closed_loop.csv} \\
+Learned-ensemble summary & \path{results/learned_ensemble/learned_summary.json} \\
+Learned-ensemble traces & \path{results/learned_ensemble/learned_traces.csv} \\
+Sweep repair gain & \path{results/sweeps/repair_gain.csv} \\
+Sweep raw rows & \path{results/sweeps/cem_sweep.csv} \\
+Claim gate & \path{docs/claims.json}, \path{scripts/run_claim_audit.py} \\
+\bottomrule
+\end{tabular}
+\caption{Primary artifacts used by the paper.}
+\end{table}
+
+\section{Claim Audit}
+\label{app:claim-audit}
+
+The repository claim file contains four claim families. Three are supported or partial with evidence files: adaptive elite-refit amplification, CEM underperforming static Best-of-$N$ in the controlled pocket world, and repair variants reducing controlled regret. The benchmark-scale PlaNet/Dreamer transfer claim is explicitly marked unsupported and is not promoted in the main text.
+
+The audit command used for verification is:
+\begin{verbatim}
+python scripts/run_claim_audit.py --repo-root .
+       --claim-file docs/claims.json
+\end{verbatim}
+The script checks that supported and partial claims cite existing evidence files, unsupported claims do not cite evidence as if proven, and repository prose avoids banned universal language such as ``CEM always hurts'' or ``guarantees improved real return.''

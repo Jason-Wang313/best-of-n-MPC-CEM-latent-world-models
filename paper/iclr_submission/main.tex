@@ -1,0 +1,185 @@
+\documentclass{article}
+\usepackage{iclr2026_conference,times}
+\input{math_commands.tex}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{url}
+
+\title{CEM as an Adaptive Model-Error Amplifier\\in Learned World-Model MPC}
+
+% Leave \iclrfinalcopy commented for anonymous review submissions.
+\author{Anonymous Authors\\Paper under double-blind review}
+
+\newtheorem{proposition}{Proposition}
+\newcommand{\cem}{\textsc{CEM}}
+\newcommand{\bon}{Best-of-$N$}
+\newcommand{\pocket}{model-error pocket}
+\newcommand{\regret}{\mathrm{Regret}}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Model-predictive control with learned world models often optimizes imagined returns. Random shooting and \bon{} select from a fixed proposal, while the cross-entropy method (\cem{}) repeatedly selects elite imagined rollouts and refits the proposal distribution. We study a narrow failure mode of that adaptation: when learned-model errors create optimistic sparse regions, elite refits can move future samples toward those regions, making model optimism self-reinforcing. We give a simple elite-refit identity showing when pocket mass increases, then test the mechanism in a controlled one-dimensional planning world with a known true optimum, a sparse learned-ensemble variant, and CEM population/iteration sweeps. In the verified full CPU run, vanilla \cem{} has mean controlled regret $11.64$ versus $6.16$ for one-shot \bon{}, while model-side repairs reduce regret to $0.22$--$0.30$ for the strongest variants. In the sparse learned-ensemble experiment, calibrated learned \cem{} reduces regret from $4.64$ to $2.96$. In sweeps, combined repair reduces mean \cem{} regret from $9.08$ to $2.33$, and short closed-loop return improves from $-2.55$ to $3.94$. These are controlled and synthetic mechanism results, not benchmark-scale or real-robot claims.
+\end{abstract}
+
+\section{Introduction}
+
+Learned world models make planning cheap by replacing real interaction with imagined rollouts. This pattern appears in latent CEM planning, latent imagination, uncertainty-aware model-based reinforcement learning, and sampling-based MPC \citep{hafner2019planet,hafner2020dreamer,chua2018pets,nagabandi2018neural,williams2017information}. The optimizer is often treated as a detachable search routine: if the model is accurate enough, stronger search should improve behavior.
+
+This paper isolates a case where that intuition can fail. A static \bon{} planner can certainly select trajectories that exploit model error, but it samples once from a fixed proposal. \cem{} samples, scores, selects elites, refits the proposal to those elites, and repeats \citep{rubinstein1999cem,deboer2005tutorial,bharadhwaj2020mpc}. If the elites are selected partly because of model error, the next proposal may move toward the error source. Optimism can become an attractor of the optimizer itself.
+
+Our central claim is deliberately bounded:
+\begin{quote}
+\emph{CEM with a learned model can be worse than a static one-shot proposal because each elite refit changes the proposal toward regions selected by model error, not necessarily real utility.}
+\end{quote}
+We make three contributions. First, we frame CEM's repeated elite refits as an adaptive model-error amplification mechanism. Second, we state a finite elite-refit identity that justifies measuring pocket occupancy, proposal drift, and elite model-error concentration. Third, we report controlled CPU evidence, sparse learned-ensemble evidence, and repair ablations that target the refit mechanism. We do not claim that CEM is generally bad, that uncertainty penalties are new, or that the result transfers to PlaNet/Dreamer-scale benchmarks without further validation.
+
+\section{Related Work}
+
+\paragraph{World-model planning.}
+PlaNet learns compact latent dynamics and performs online planning with CEM-style shooting \citep{hafner2019planet}. Dreamer learns behavior from latent imagination, using gradients through imagined trajectories rather than relying primarily on online CEM \citep{hafner2020dreamer}. PETS combines probabilistic ensembles with trajectory sampling to reduce model-bias damage in MPC \citep{chua2018pets}. Earlier neural-dynamics MPC systems and information-theoretic MPC also show the importance of sampled action-sequence optimization \citep{nagabandi2018neural,williams2017information}.
+
+\paragraph{CEM and hybrid MPC.}
+The cross-entropy method is a general adaptive sampling optimizer that repeatedly selects elites and refits a proposal distribution \citep{rubinstein1999cem,deboer2005tutorial}. Hybrid CEM/gradient MPC improves action-sequence optimization by interleaving sampling and gradient steps \citep{bharadhwaj2020mpc}. Our focus is not optimizer efficiency. We ask what the elite-refit loop does when the learned objective contains sparse optimism.
+
+\paragraph{Model bias and exploitation.}
+Model-based RL is vulnerable to model error, compounding prediction error, and planner exploitation of learned-model artifacts \citep{talvitie2014model,janner2019mbpo}. Prior work motivates uncertainty penalties, ensembles, short rollouts, and conservative model use. The novelty boundary here is narrower: we treat CEM's adaptive refit as the mechanism under audit, and measure whether proposal drift, elite model error, pocket occupancy, and executed regret rise together.
+
+\section{Mechanism}
+
+Let $a$ denote an action sequence, $U(a)$ the true return, and $S(a)$ the learned-model score. Write model error in return space as $E(a)=S(a)-U(a)$. A one-shot \bon{} planner draws candidates from a fixed proposal and executes the candidate with maximum $S$. CEM draws candidates from proposal $q_t$, selects the top $\rho$ fraction by $S$, refits $q_{t+1}$ to the elites, and repeats.
+
+Suppose a sparse region of action-sequence space enters a \pocket{}. If pocket trajectories are overrepresented among model-scored elites, CEM's refit moves the next proposal toward the pocket. That movement can increase the chance of sampling more pocket trajectories on the next iteration. The repository measures four primary diagnostics: proposal drift from the initial Gaussian, elite model-error concentration, pocket occupancy among elites, and the selected-tail gap $S(a_{\mathrm{sel}})-U(a_{\mathrm{sel}})$.
+
+\section{Theory}
+
+The following identity is intentionally modest. It is not a regret theorem, and diagonal Gaussian CEM only approximates the exact conditional update through elite moment matching. Its purpose is to justify the diagnostic: if a model-error pocket is elite-enriched, proposal drift toward that pocket is the expected behavior of the refit.
+
+\begin{proposition}[Elite-refit pocket amplification]
+Let $P(a)\in\{0,1\}$ indicate whether action sequence $a$ enters a model-error pocket, and let $L_t(a)\in\{0,1\}$ indicate whether $a$ is elite under proposal $q_t$. Assume $\Pr_{q_t}(L_t=1)=\rho$ and an idealized CEM update that refits the next proposal's pocket mass exactly to the elite conditional mass:
+\begin{equation}
+q_{t+1}(P=1)=\Pr_{a\sim q_t}(P(a)=1\mid L_t(a)=1).
+\end{equation}
+If $\Pr(L_t=1\mid P=1)>\rho$, then $q_{t+1}(P=1)>q_t(P=1)$ and
+\begin{equation}
+\frac{q_{t+1}(P=1)}{q_t(P=1)}
+=
+\frac{\Pr(L_t=1\mid P=1)}{\rho}.
+\end{equation}
+For any moment-matched trajectory feature $\phi(a)$ under the exact elite-conditional refit,
+\begin{equation}
+\mathbb{E}_{q_{t+1}}[\phi]-\mathbb{E}_{q_t}[\phi]
+=
+\frac{\mathrm{Cov}_{q_t}(\phi,L_t)}{\rho}.
+\end{equation}
+\end{proposition}
+
+\paragraph{Proof sketch.}
+The pocket-mass identity follows from Bayes' rule:
+$\Pr(P=1\mid L=1)=\Pr(L=1\mid P=1)\Pr(P=1)/\Pr(L=1)$.
+The feature update follows from the exact conditional distribution,
+$\mathbb{E}[\phi\mid L=1]-\mathbb{E}[\phi]
+=\mathbb{E}[\phi L]/\rho-\mathbb{E}[\phi]
+=\mathrm{Cov}(\phi,L)/\rho$. Appendix~\ref{app:proof} gives details and limitations.
+
+\section{Experiments}
+
+\paragraph{Controlled pocket world.}
+The main experiment uses a one-dimensional world with a true goal and a narrow harmful region. The learned model hallucinates positive reward in the harmful sparse region. This makes the true optimum, model-error pocket, and model-versus-true gap inspectable. The verified full CPU run uses 12 seeds, CEM population 256, and 5 CEM iterations. The full-run summary is stored in \path{results/controlled/controlled_summary.json}.
+
+\paragraph{Sparse learned ensemble.}
+The second experiment trains a bootstrapped polynomial ensemble on transition data with sparse coverage of the harmful region. This checks whether the same diagnostics remain useful when optimism is produced by a learned sparse-region model rather than only by an analytic hallucinated bonus.
+
+\paragraph{Sweeps and closed loop.}
+The sweep varies CEM population, iteration count, and elite fraction over 180 rows. A short receding-horizon evaluation executes the first action, observes the next state, and replans. These artifacts are small CPU experiments; they are intended to stress the mechanism, not to replace benchmark-scale MPC evaluation.
+
+\begin{table}[t]
+\caption{Main verified evidence. Regret is against the strengthened true-oracle estimate in the controlled world; lower is better. Closed-loop return is higher-is-better.}
+\label{tab:main-results}
+\centering
+\small
+\begin{tabular}{@{}llr@{}}
+\toprule
+Setting & Planner or comparison & Metric \\
+\midrule
+Controlled & CEM, pilot calibrated & regret $0.22$ \\
+Controlled & CEM, disagreement veto & regret $0.23$ \\
+Controlled & CEM, uncertainty pessimism & regret $0.30$ \\
+Controlled & CEM, combined repair & regret $0.77$ \\
+Controlled & Best-of-$N$ & regret $6.16$ \\
+Controlled & equal-budget Best-of-$N$ & regret $7.99$ \\
+Controlled & random shooting & regret $9.64$ \\
+Controlled & vanilla CEM & regret $11.64$ \\
+Controlled & CEM, diversity floor only & regret $13.31$ \\
+\midrule
+Learned ensemble & calibrated learned CEM & regret $2.96$ \\
+Learned ensemble & learned Best-of-$N$ & regret $3.19$ \\
+Learned ensemble & uncertainty-penalized learned CEM & regret $3.35$ \\
+Learned ensemble & vanilla learned CEM & regret $4.64$ \\
+\midrule
+Sweep & combined repair over vanilla CEM & regret $9.08\rightarrow2.33$ \\
+Closed loop & combined repair over vanilla CEM & return $-2.55\rightarrow3.94$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\begin{minipage}{0.49\linewidth}
+\centering
+\includegraphics[width=\linewidth]{figures/controlled/regret_bars.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.49\linewidth}
+\centering
+\includegraphics[width=\linewidth]{figures/controlled/elite_refit_drift.png}
+\end{minipage}
+\caption{Controlled pocket-world evidence. Left: mean regret by planner shows vanilla CEM underperforming one-shot static proposals while model-side repairs reduce regret. Right: CEM traces expose the mechanism through proposal drift, elite model error, and pocket occupancy rather than only final return.}
+\label{fig:controlled}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\begin{minipage}{0.47\linewidth}
+\centering
+\includegraphics[width=\linewidth]{figures/learned_ensemble/learned_regret.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.47\linewidth}
+\centering
+\includegraphics[width=\linewidth]{figures/sweeps/cem_budget_iteration_heatmap.png}
+\end{minipage}
+\caption{Additional mechanism checks. Left: sparse learned-ensemble regret shows calibrated learned CEM reducing regret relative to vanilla learned CEM. Right: population/iteration/elite-fraction sweeps show where combined repair interrupts high-regret adaptive concentration.}
+\label{fig:learned-sweep}
+\end{figure}
+
+\section{Repairs}
+
+The repair methods are intentionally simple and auditable. Uncertainty pessimism subtracts ensemble disagreement from the learned score. Model-disagreement veto removes candidates above a disagreement quantile. Pilot-label calibration fits a small optimism penalty using explicitly supplied pilot labels. Conservative refit temperature slows variance collapse. Elite diversity floors prevent all elites from becoming near-duplicates. Shadow-realism scoring penalizes trajectories that look out-of-support under simple support proxies.
+
+These repairs are mechanism probes, not deployable safety guarantees. Tests ensure that repaired planners do not call true evaluation labels during planning. Pilot calibration is the one method that uses real labels, and it uses only labels explicitly supplied by the pilot set.
+
+\section{Limitations}
+
+The main benchmark is controlled and synthetic. The sparse learned-ensemble experiment is low-dimensional. The proposition is a diagnostic elite-refit identity, not a general regret guarantee. Equal-budget static \bon{} can also fail when it samples the bad pocket. The current evidence should therefore be read as a mechanism scaffold, not a completed benchmark paper. The next validation step is to port these diagnostics into PlaNet/PETS-style continuous-control benchmarks and test whether latent uncertainty, disagreement, and realism proxies produce the same repair pattern.
+
+\section{Conclusion}
+
+CEM's strength is adaptation, but adaptation can also amplify the wrong signal. In learned world-model MPC, elite imagined rollouts may be elite because they are truly useful, because they exploit model error, or both. This repository shows a controlled setting where refitting to those elites concentrates search into model-error pockets and damages real return. The repair results suggest that slowing, vetoing, or calibrating uncertain elite concentration is a promising direction, while the final claim remains bounded to controlled CPU evidence.
+
+\section*{Reproducibility Statement}
+The source package includes the ICLR LaTeX files, local style files, copied figures, and the appendix artifact map. Repository claims are gated by \path{scripts/run_claim_audit.py --repo-root . --claim-file docs/claims.json}. All main empirical numbers are read from committed CSV/JSON artifacts under \path{results/}.
+
+\bibliography{references}
+\bibliographystyle{iclr2026_conference}
+
+\appendix
+\input{appendix}
+
+\end{document}
