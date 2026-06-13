@@ -21,9 +21,9 @@ The search also checked the broader planner-overfitting idea: learned models can
 
 ## Incremental
 
-- Showing that larger Best-of-N samples can select optimistic model errors.
+- Showing that larger static proposal samples can select optimistic model errors.
 - Adding an uncertainty penalty to CEM.
-- Comparing random shooting, Best-of-N, and CEM on a toy learned-model failure.
+- Comparing random shooting, static proposal, and CEM on a toy learned-model failure.
 - Plotting predicted return versus executed return.
 
 Those are useful baselines, but they are not enough for a sharp paper.
@@ -48,7 +48,7 @@ The repo operationalizes this with:
 - The learned ensemble is still a small synthetic model, not a high-dimensional latent world model.
 - The theorem is an elite-conditioning identity and drift diagnostic, not a regret theorem.
 - Repairs use proxies that are available in the toy world; stronger work should test whether analogous latent-space proxies work in PlaNet/Dreamer-like systems.
-- Equal-budget Best-of-N can also fail when it samples the pocket, so the claim must be "CEM can amplify" rather than "CEM is dominated."
+- Equal-budget static proposal can also fail when it samples the pocket, so the claim must be "CEM can amplify" rather than "CEM is dominated."
 
 ## Most Worth Pursuing
 

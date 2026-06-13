@@ -2,11 +2,11 @@
 
 ## 1. What Is The Discovered Main Thesis?
 
-CEM is an adaptive model-error amplifier in learned-model MPC. Unlike static Best-of-N, CEM repeatedly refits its proposal to imagined elites. When elite status is partly caused by learned-model optimism, the next proposal can concentrate around that error pocket and intensify the mismatch between imagined and executed return.
+CEM is an adaptive model-error amplifier in learned-model MPC. Unlike a static-proposal baseline, CEM repeatedly refits its proposal to imagined elites. When elite status is partly caused by learned-model optimism, the next proposal can concentrate around that error pocket and intensify the mismatch between imagined and executed return.
 
 ## 2. What Is Genuinely New?
 
-The new part is the elite-refit framing and diagnostic package: proposal drift, elite model-error concentration, pocket occupancy, selected-tail gap, and repair ablations aimed at interrupting refit amplification. The repo treats Best-of-N overfitting as the baseline and asks what adaptation adds.
+The new part is the elite-refit framing and diagnostic package: proposal drift, elite model-error concentration, pocket occupancy, selected-tail gap, and repair ablations aimed at interrupting refit amplification. The repo treats static-proposal overfitting as the baseline and asks what adaptation adds.
 
 ## 3. What Theorem/Proof Survived Adversarial Checking?
 
@@ -14,7 +14,7 @@ The surviving proposition is a finite elite-refit law: if a pocket is overrepres
 
 ## 4. What Is The Strongest Empirical Result?
 
-The controlled toy experiment is the strongest result. In the verified full run, vanilla CEM had mean regret `11.64`, one-shot Best-of-N had `6.16`, equal-budget Best-of-N had `7.99`, and random shooting had `9.64`. The CEM traces record proposal drift, elite model error, and pocket occupancy per iteration, making the mechanism inspectable rather than only outcome-based.
+The controlled toy experiment is the strongest result. In the verified full run, vanilla CEM had mean regret `11.64`, the static-proposal baseline had `6.16`, the equal-budget static baseline had `7.99`, and random shooting had `9.64`. The CEM traces record proposal drift, elite model error, and pocket occupancy per iteration, making the mechanism inspectable rather than only outcome-based.
 
 ## 5. What Is The Strongest Repair Result?
 

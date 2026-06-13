@@ -7,7 +7,7 @@
 \usepackage{amsthm}
 \usepackage{booktabs}
 \usepackage{graphicx}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 \usepackage{url}
 
 \title{CEM as an Adaptive Model-Error Amplifier\\in Learned World-Model MPC}
@@ -17,7 +17,6 @@
 
 \newtheorem{proposition}{Proposition}
 \newcommand{\cem}{\textsc{CEM}}
-\newcommand{\bon}{Best-of-$N$}
 \newcommand{\pocket}{model-error pocket}
 \newcommand{\regret}{\mathrm{Regret}}
 
@@ -25,14 +24,14 @@
 \maketitle
 
 \begin{abstract}
-Model-predictive control with learned world models often optimizes imagined returns. Random shooting and \bon{} select from a fixed proposal, while the cross-entropy method (\cem{}) repeatedly selects elite imagined rollouts and refits the proposal distribution. We study a narrow failure mode of that adaptation: when learned-model errors create optimistic sparse regions, elite refits can move future samples toward those regions, making model optimism self-reinforcing. We give a simple elite-refit identity showing when pocket mass increases, then test the mechanism in a controlled one-dimensional planning world with a known true optimum, a sparse learned-ensemble variant, and CEM population/iteration sweeps. In the verified full CPU run, vanilla \cem{} has mean controlled regret $11.64$ versus $6.16$ for one-shot \bon{}, while model-side repairs reduce regret to $0.22$--$0.30$ for the strongest variants. In the sparse learned-ensemble experiment, calibrated learned \cem{} reduces regret from $4.64$ to $2.96$. In sweeps, combined repair reduces mean \cem{} regret from $9.08$ to $2.33$, and short closed-loop return improves from $-2.55$ to $3.94$. These are controlled and synthetic mechanism results, not benchmark-scale or real-robot claims.
+Model-predictive control with learned world models often optimizes imagined returns. Random shooting and static-proposal selection choose from a fixed proposal, while the cross-entropy method (\cem{}) repeatedly selects elite imagined rollouts and refits the proposal distribution. We study a narrow failure mode of that adaptation: when learned-model errors create optimistic sparse regions, elite refits can move future samples toward those regions, making model optimism self-reinforcing. We give a simple elite-refit identity showing when pocket mass increases, then test the mechanism in a controlled one-dimensional planning world with a known true optimum, a sparse learned-ensemble variant, and CEM population/iteration sweeps. In the verified full CPU run, vanilla \cem{} has mean controlled regret $11.64$ versus $6.16$ for a static-proposal baseline, while model-side repairs reduce regret to $0.22$--$0.30$ for the strongest variants. In the sparse learned-ensemble experiment, calibrated learned \cem{} reduces regret from $4.64$ to $2.96$. In sweeps, combined repair reduces mean \cem{} regret from $9.08$ to $2.33$, and short closed-loop return improves from $-2.55$ to $3.94$. These are controlled and synthetic mechanism results, not benchmark-scale or real-robot claims.
 \end{abstract}
 
 \section{Introduction}
 
 Learned world models make planning cheap by replacing real interaction with imagined rollouts. This pattern appears in latent CEM planning, latent imagination, uncertainty-aware model-based reinforcement learning, and sampling-based MPC \citep{hafner2019planet,hafner2020dreamer,chua2018pets,nagabandi2018neural,williams2017information}. The optimizer is often treated as a detachable search routine: if the model is accurate enough, stronger search should improve behavior.
 
-This paper isolates a case where that intuition can fail. A static \bon{} planner can certainly select trajectories that exploit model error, but it samples once from a fixed proposal. \cem{} samples, scores, selects elites, refits the proposal to those elites, and repeats \citep{rubinstein1999cem,deboer2005tutorial,bharadhwaj2020mpc}. If the elites are selected partly because of model error, the next proposal may move toward the error source. Optimism can become an attractor of the optimizer itself.
+This paper isolates a case where that intuition can fail. A static-proposal planner can certainly select trajectories that exploit model error, but it samples once from a fixed proposal. \cem{} samples, scores, selects elites, refits the proposal to those elites, and repeats \citep{rubinstein1999cem,deboer2005tutorial,bharadhwaj2020mpc}. If the elites are selected partly because of model error, the next proposal may move toward the error source. Optimism can become an attractor of the optimizer itself.
 
 Our central claim is deliberately bounded:
 \begin{quote}
@@ -53,7 +52,7 @@ Model-based RL is vulnerable to model error, compounding prediction error, and p
 
 \section{Mechanism}
 
-Let $a$ denote an action sequence, $U(a)$ the true return, and $S(a)$ the learned-model score. Write model error in return space as $E(a)=S(a)-U(a)$. A one-shot \bon{} planner draws candidates from a fixed proposal and executes the candidate with maximum $S$. CEM draws candidates from proposal $q_t$, selects the top $\rho$ fraction by $S$, refits $q_{t+1}$ to the elites, and repeats.
+Let $a$ denote an action sequence, $U(a)$ the true return, and $S(a)$ the learned-model score. Write model error in return space as $E(a)=S(a)-U(a)$. A static-proposal planner draws candidates from a fixed proposal and executes the candidate with maximum $S$. CEM draws candidates from proposal $q_t$, selects the top $\rho$ fraction by $S$, refits $q_{t+1}$ to the elites, and repeats.
 
 Suppose a sparse region of action-sequence space enters a \pocket{}. If pocket trajectories are overrepresented among model-scored elites, CEM's refit moves the next proposal toward the pocket. That movement can increase the chance of sampling more pocket trajectories on the next iteration. The repository measures four primary diagnostics: proposal drift from the initial Gaussian, elite model-error concentration, pocket occupancy among elites, and the selected-tail gap $S(a_{\mathrm{sel}})-U(a_{\mathrm{sel}})$.
 
@@ -112,14 +111,14 @@ Controlled & CEM, pilot calibrated & regret $0.22$ \\
 Controlled & CEM, disagreement veto & regret $0.23$ \\
 Controlled & CEM, uncertainty pessimism & regret $0.30$ \\
 Controlled & CEM, combined repair & regret $0.77$ \\
-Controlled & Best-of-$N$ & regret $6.16$ \\
-Controlled & equal-budget Best-of-$N$ & regret $7.99$ \\
+Controlled & static-proposal baseline & regret $6.16$ \\
+Controlled & equal-budget static baseline & regret $7.99$ \\
 Controlled & random shooting & regret $9.64$ \\
 Controlled & vanilla CEM & regret $11.64$ \\
 Controlled & CEM, diversity floor only & regret $13.31$ \\
 \midrule
 Learned ensemble & calibrated learned CEM & regret $2.96$ \\
-Learned ensemble & learned Best-of-$N$ & regret $3.19$ \\
+Learned ensemble & learned static-proposal baseline & regret $3.19$ \\
 Learned ensemble & uncertainty-penalized learned CEM & regret $3.35$ \\
 Learned ensemble & vanilla learned CEM & regret $4.64$ \\
 \midrule
@@ -167,7 +166,7 @@ These repairs are mechanism probes, not deployable safety guarantees. Tests ensu
 
 \section{Limitations}
 
-The main benchmark is controlled and synthetic. The sparse learned-ensemble experiment is low-dimensional. The proposition is a diagnostic elite-refit identity, not a general regret guarantee. Equal-budget static \bon{} can also fail when it samples the bad pocket. The current evidence should therefore be read as a mechanism scaffold, not a completed benchmark paper. The next validation step is to port these diagnostics into PlaNet/PETS-style continuous-control benchmarks and test whether latent uncertainty, disagreement, and realism proxies produce the same repair pattern.
+The main benchmark is controlled and synthetic. The sparse learned-ensemble experiment is low-dimensional. The proposition is a diagnostic elite-refit identity, not a general regret guarantee. Equal-budget static proposals can also fail when they sample the bad pocket. The current evidence should therefore be read as a mechanism scaffold, not a completed benchmark paper. The next validation step is to port these diagnostics into PlaNet/PETS-style continuous-control benchmarks and test whether latent uncertainty, disagreement, and realism proxies produce the same repair pattern.
 
 \section{Conclusion}
 

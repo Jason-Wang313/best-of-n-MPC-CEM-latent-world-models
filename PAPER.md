@@ -2,7 +2,7 @@
 
 ## Abstract
 
-Model-predictive control with learned world models commonly chooses action sequences by optimizing imagined returns. Random shooting and Best-of-N select from a fixed proposal, while the cross-entropy method (CEM) repeatedly selects elite imagined rollouts and refits its proposal distribution. This paper studies a narrow failure mode of that adaptation: when learned-model errors create optimistic sparse regions, CEM can make the optimizer's next samples more likely to revisit those regions. The result is not merely tail overfitting from a large sample; it is self-reinforcing proposal drift caused by elite refits.
+Model-predictive control with learned world models commonly chooses action sequences by optimizing imagined returns. Random shooting and static proposal select from a fixed proposal, while the cross-entropy method (CEM) repeatedly selects elite imagined rollouts and refits its proposal distribution. This paper studies a narrow failure mode of that adaptation: when learned-model errors create optimistic sparse regions, CEM can make the optimizer's next samples more likely to revisit those regions. The result is not merely tail overfitting from a large sample; it is self-reinforcing proposal drift caused by elite refits.
 
 We introduce a controlled one-dimensional planning benchmark with a known true optimum and a hidden model-error pocket, a sparse learned-ensemble variant, diagnostics for elite-refit drift and tail optimism, and repair baselines that target the refit mechanism. The current evidence supports a bounded mechanism claim: CEM can amplify learned-model optimism and can underperform static proposals in controlled settings. The repo does not claim high-dimensional benchmark transfer.
 
@@ -10,11 +10,11 @@ We introduce a controlled one-dimensional planning benchmark with a known true o
 
 Learned world models make planning cheap by replacing real interaction with imagined rollouts. This pattern appears in latent CEM planning, latent imagination, uncertainty-aware model-based reinforcement learning, and hybrid sampling-gradient MPC. The optimizer is often treated as a detachable search routine: if the model is good enough, better search should improve behavior.
 
-This paper isolates a case where that intuition can fail. A static Best-of-N planner can certainly pick trajectories that exploit model error, but it samples once from a fixed proposal. CEM samples, scores, selects elites, refits the proposal to those elites, and repeats. If the elites are selected partly because of model error, the next proposal may move toward the error source. Optimism can become an attractor of the optimizer itself.
+This paper isolates a case where that intuition can fail. A static-proposal planner can certainly pick trajectories that exploit model error, but it samples once from a fixed proposal. CEM samples, scores, selects elites, refits the proposal to those elites, and repeats. If the elites are selected partly because of model error, the next proposal may move toward the error source. Optimism can become an attractor of the optimizer itself.
 
 The central thesis is:
 
-> CEM with a learned model can be worse than static Best-of-N because each elite refit changes the proposal toward regions selected by model error, not necessarily real utility.
+> CEM with a learned model can be worse than a static-proposal baseline because each elite refit changes the proposal toward regions selected by model error, not necessarily real utility.
 
 The project is designed to expose, measure, repair, and audit this mechanism without overclaiming.
 
@@ -28,7 +28,7 @@ This is not a claim that CEM is generally bad. It is also not a claim that uncer
 
 ## 3. Mechanism
 
-Let `a` denote an action sequence, `U(a)` the true return, and `S(a)` the learned-model score. Write the model error in return space as `E(a) = S(a) - U(a)`. A one-shot Best-of-N planner draws candidates from a fixed proposal and selects the best score. CEM draws candidates from proposal `q_t`, selects the top `rho` fraction by `S`, refits `q_{t+1}` to the elites, and repeats.
+Let `a` denote an action sequence, `U(a)` the true return, and `S(a)` the learned-model score. Write the model error in return space as `E(a) = S(a) - U(a)`. A one-shot static proposal planner draws candidates from a fixed proposal and selects the best score. CEM draws candidates from proposal `q_t`, selects the top `rho` fraction by `S`, refits `q_{t+1}` to the elites, and repeats.
 
 Suppose a sparse region of action-sequence space enters a model-error pocket. If trajectories in that pocket are overrepresented among model-scored elites, CEM's refit moves the next proposal toward the pocket. That movement can increase the chance of sampling even more pocket trajectories on the next iteration.
 
@@ -68,8 +68,8 @@ The main experiment uses a one-dimensional world with a true goal and a narrow h
 Compared planners:
 
 - Random shooting.
-- One-shot Best-of-N.
-- Equal-budget one-shot Best-of-N.
+- One-shot static proposal.
+- Equal-budget one-shot static proposal.
 - Vanilla CEM.
 - CEM with uncertainty pessimism.
 - CEM with elite diversity floor.
@@ -89,8 +89,8 @@ The verified full CPU run in this checkout produced the following mean regrets a
 | CEM, combined repair | 0.77 |
 | CEM, conservative temperature | 2.57 |
 | CEM, shadow realism | 5.17 |
-| Best-of-N | 6.16 |
-| Equal-budget Best-of-N | 7.99 |
+| static proposal | 6.16 |
+| Equal-budget static proposal | 7.99 |
 | Random shooting | 9.64 |
 | Vanilla CEM | 11.64 |
 | CEM, diversity floor only | 13.31 |
@@ -101,7 +101,7 @@ The important result is not just that vanilla CEM had high regret. The traces al
 
 The second experiment trains a small bootstrapped polynomial ensemble on transition data with sparse coverage of the harmful region. This checks whether the effect can appear when optimism comes from a learned sparse-region model rather than only from an analytic hallucinated bonus.
 
-In the verified run, vanilla learned CEM had mean regret `4.64`, while calibrated learned CEM had `2.96`. Best-of-N had `3.19`, and uncertainty-penalized learned CEM had `3.35`. This supports the direction of the mechanism but remains a small synthetic test.
+In the verified run, vanilla learned CEM had mean regret `4.64`, while calibrated learned CEM had `2.96`. static proposal had `3.19`, and uncertainty-penalized learned CEM had `3.35`. This supports the direction of the mechanism but remains a small synthetic test.
 
 ### Sweeps
 
@@ -122,7 +122,7 @@ Tests ensure that repaired planners do not call true evaluation labels during pl
 
 ## 7. Limitations
 
-The main benchmark is controlled and synthetic. The sparse learned-ensemble experiment is still low-dimensional. The theorem is a diagnostic elite-refit identity, not a general regret guarantee. Equal-budget static Best-of-N can also fail when it samples the bad pocket. The current evidence should therefore be read as a mechanism scaffold, not a completed benchmark paper.
+The main benchmark is controlled and synthetic. The sparse learned-ensemble experiment is still low-dimensional. The theorem is a diagnostic elite-refit identity, not a general regret guarantee. Equal-budget static proposals can also fail when they sample the bad pocket. The current evidence should therefore be read as a mechanism scaffold, not a completed benchmark paper.
 
 The next step is to port these diagnostics into a PlaNet/PETS-style continuous-control benchmark and test whether latent uncertainty, disagreement, and realism proxies produce the same repair pattern.
 

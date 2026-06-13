@@ -1,7 +1,7 @@
 seed,planner,closed_loop_steps,closed_loop_return
-0,best_of_n,2,0.7010353201966605
+0,static_proposal,2,0.7010353201966605
 0,cem,2,0.8166339873660191
 0,cem_combined_repair,2,0.860935800244215
-1,best_of_n,2,-0.9914233600238415
+1,static_proposal,2,-0.9914233600238415
 1,cem,2,-0.9699194730281224
 1,cem_combined_repair,2,0.4725904052051087

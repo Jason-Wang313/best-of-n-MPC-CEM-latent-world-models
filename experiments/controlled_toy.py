@@ -11,10 +11,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from boncem.metrics import estimate_true_optimum, summarize_rows, trace_rows
-from boncem.planners import BestOfNPlanner, CEMPlanner, PlannerConfig, RandomShootingPlanner
-from boncem.scoring import ModelScorer, PilotCalibrator, RepairConfig
-from boncem.worlds import ToyWorld, ToyWorldConfig
+from cem_refit_audit.metrics import estimate_true_optimum, summarize_rows, trace_rows
+from cem_refit_audit.planners import StaticProposalPlanner, CEMPlanner, PlannerConfig, RandomShootingPlanner
+from cem_refit_audit.scoring import ModelScorer, PilotCalibrator, RepairConfig
+from cem_refit_audit.worlds import ToyWorld, ToyWorldConfig
 
 
 def _seed_list(values: list[str]) -> list[int]:
@@ -97,8 +97,8 @@ def run_once(
     )
     planners = {
         "random_shooting": RandomShootingPlanner(base_cfg),
-        "best_of_n": BestOfNPlanner(base_cfg),
-        "best_of_n_equal_budget": BestOfNPlanner(
+        "static_proposal": StaticProposalPlanner(base_cfg),
+        "static_equal_budget": StaticProposalPlanner(
             PlannerConfig(**{**base_cfg.__dict__, "population": population * iterations})
         ),
     }
@@ -135,7 +135,7 @@ def run_once(
 
     if closed_loop_steps > 0:
         subset = {
-            "best_of_n": (BestOfNPlanner, RepairConfig(name="none"), False),
+            "static_proposal": (StaticProposalPlanner, RepairConfig(name="none"), False),
             "cem": (CEMPlanner, RepairConfig(name="none"), False),
             "cem_combined_repair": (CEMPlanner, make_repairs()["cem_combined_repair"][0], True),
         }
@@ -171,8 +171,8 @@ def plot_results(df: pd.DataFrame, traces: pd.DataFrame, figure_dir: Path) -> No
     figure_dir.mkdir(parents=True, exist_ok=True)
     order = [
         "random_shooting",
-        "best_of_n",
-        "best_of_n_equal_budget",
+        "static_proposal",
+        "static_equal_budget",
         "cem",
         "cem_uncertainty",
         "cem_veto",

@@ -12,8 +12,8 @@
     "cem_veto": 1.4806696460400866,
     "cem_combined_repair": 1.5763026796116084,
     "cem_conservative": 6.644621886734116,
-    "best_of_n": 6.769193068190745,
-    "best_of_n_equal_budget": 6.769193068190745,
+    "static_equal_budget": 6.769193068190745,
+    "static_proposal": 6.769193068190745,
     "cem": 7.161102770106881,
     "cem_diversity": 7.161102770106881,
     "cem_shadow": 7.285394794210666,
@@ -24,8 +24,8 @@
     "cem_pilot_calibrated": 3.008224780387536e-10,
     "cem_veto": 4.440323664312018e-10,
     "cem_combined_repair": 8.449578814406777e-10,
-    "best_of_n": 4.467754802198443,
-    "best_of_n_equal_budget": 4.467754802198443,
+    "static_equal_budget": 4.467754802198443,
+    "static_proposal": 4.467754802198443,
     "cem_conservative": 4.585095582964071,
     "cem_shadow": 5.481493351229884,
     "cem": 5.7020523234555505,
@@ -38,8 +38,8 @@
     "cem_veto": 6.323752014355232,
     "cem_combined_repair": 6.2281189807837105,
     "cem_conservative": 1.1597997736612031,
-    "best_of_n": 1.0352285922045736,
-    "best_of_n_equal_budget": 1.0352285922045736,
+    "static_equal_budget": 1.0352285922045736,
+    "static_proposal": 1.0352285922045736,
     "cem": 0.6433188902884375,
     "cem_diversity": 0.6433188902884375,
     "cem_shadow": 0.5190268661846527,
@@ -48,6 +48,6 @@
   "closed_loop_return_by_planner": {
     "cem_combined_repair": 0.6667631027246619,
     "cem": -0.07664274283105166,
-    "best_of_n": -0.1451940199135905
+    "static_proposal": -0.1451940199135905
   }
 }

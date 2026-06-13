@@ -1,1 +1,1 @@
-"""Experiment entrypoints for the Best-of-N/CEM world-model study."""
+"""Experiment entrypoints for elite-refit world-model planning audits."""

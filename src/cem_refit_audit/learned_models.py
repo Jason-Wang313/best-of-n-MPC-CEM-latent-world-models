@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from boncem.worlds import ToyWorld, gaussian
+from cem_refit_audit.worlds import ToyWorld, gaussian
 
 
 Array = np.ndarray

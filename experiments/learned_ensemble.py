@@ -11,11 +11,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from boncem.learned_models import PolynomialEnsembleModel
-from boncem.metrics import estimate_true_optimum, summarize_rows, trace_rows
-from boncem.planners import BestOfNPlanner, CEMPlanner, PlannerConfig
-from boncem.scoring import ModelScorer, PilotCalibrator, RepairConfig
-from boncem.worlds import ToyWorld
+from cem_refit_audit.learned_models import PolynomialEnsembleModel
+from cem_refit_audit.metrics import estimate_true_optimum, summarize_rows, trace_rows
+from cem_refit_audit.planners import StaticProposalPlanner, CEMPlanner, PlannerConfig
+from cem_refit_audit.scoring import ModelScorer, PilotCalibrator, RepairConfig
+from cem_refit_audit.worlds import ToyWorld
 
 
 def run_learned(seed: int, population: int, iterations: int, train_transitions: int) -> tuple[list[dict], list[dict]]:
@@ -47,7 +47,7 @@ def run_learned(seed: int, population: int, iterations: int, train_transitions: 
     pilot = rng.uniform(world.action_bounds[0], world.action_bounds[1], size=(96, world.horizon, world.action_dim))
     calibrator = PilotCalibrator(ridge=1e-2).fit(learned.score_components(pilot), world.true_returns(pilot))
     planners = {
-        "learned_best_of_n": (BestOfNPlanner(cfg), RepairConfig(name="none"), None),
+        "learned_static_proposal": (StaticProposalPlanner(cfg), RepairConfig(name="none"), None),
         "learned_cem": (CEMPlanner(cfg, name="learned_cem"), RepairConfig(name="none"), None),
         "learned_cem_uncertainty": (
             CEMPlanner(

@@ -33,14 +33,14 @@ in the ideal conditional-distribution update. In Gaussian CEM, the implemented m
 
 ## Interpretation
 
-The result is small but useful. It says the CEM refit amplifies any feature that is overrepresented among model-scored elites. If a learned-model error pocket is more likely to pass the elite threshold than a random proposal sample, the next proposal places more mass there. This is different from one-shot Best-of-N, whose proposal distribution does not change after selecting a tail sample.
+The result is small but useful. It says the CEM refit amplifies any feature that is overrepresented among model-scored elites. If a learned-model error pocket is more likely to pass the elite threshold than a random proposal sample, the next proposal places more mass there. This is different from one-shot static proposal, whose proposal distribution does not change after selecting a tail sample.
 
 ## What It Does Not Prove
 
 - It does not prove that CEM has higher regret in every learned model.
 - It does not prove that uncertainty penalties are sufficient in high-dimensional latent planners.
 - It does not cover arbitrary parametric refits exactly; diagonal Gaussian CEM only moment-matches the elite sample.
-- It does not remove the possibility that equal-budget static Best-of-N also finds the same bad pocket.
+- It does not remove the possibility that an equal-budget static proposal also finds the same bad pocket.
 
 ## Empirical Diagnostic
 

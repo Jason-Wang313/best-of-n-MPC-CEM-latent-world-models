@@ -24,10 +24,10 @@ Diagonal Gaussian CEM does not represent arbitrary pocket indicators exactly. In
 \label{app:settings}
 
 \paragraph{Controlled pocket world.}
-The full controlled run uses seeds $0$ through $11$, CEM population $256$, elite fraction $0.1$, $5$ CEM iterations, horizon $8$, action dimension $1$, action range $[-1,1]$, initial standard deviation $0.82$, minimum standard deviation $0.035$, and zero momentum. It compares random shooting, one-shot Best-of-$N$, equal-budget Best-of-$N$, vanilla CEM, uncertainty pessimism, elite diversity floor, model-disagreement veto, pilot-label calibration, conservative refit temperature, shadow-realism scoring, and combined repaired CEM.
+The full controlled run uses seeds $0$ through $11$, CEM population $256$, elite fraction $0.1$, $5$ CEM iterations, horizon $8$, action dimension $1$, action range $[-1,1]$, initial standard deviation $0.82$, minimum standard deviation $0.035$, and zero momentum. It compares random shooting, one-shot static proposal, equal-budget static proposal, vanilla CEM, uncertainty pessimism, elite diversity floor, model-disagreement veto, pilot-label calibration, conservative refit temperature, shadow-realism scoring, and combined repaired CEM.
 
 \paragraph{Sparse learned ensemble.}
-The learned-ensemble run uses six seeds and trains a small bootstrapped polynomial ensemble on sparse transition coverage around the harmful region. It compares vanilla learned CEM, calibrated learned CEM, uncertainty-penalized learned CEM, and learned Best-of-$N$. The result is intended to check whether the controlled mechanism appears when optimism comes from learned sparse-region bias.
+The learned-ensemble run uses six seeds and trains a small bootstrapped polynomial ensemble on sparse transition coverage around the harmful region. It compares vanilla learned CEM, calibrated learned CEM, uncertainty-penalized learned CEM, and learned static proposal. The result is intended to check whether the controlled mechanism appears when optimism comes from learned sparse-region bias.
 
 \paragraph{Sweeps and closed loop.}
 The sweep covers population in $\{96,192,384\}$, CEM iterations in $\{1,2,4,6\}$, elite fraction in $\{0.05,0.1,0.2\}$, and seeds $0$ through $4$, for 180 rows. Closed-loop evaluation executes the first action of the selected plan, observes the next state, and replans over a short horizon. The closed-loop result is reported as a small receding-horizon stress test, not as a global theorem.
@@ -80,7 +80,7 @@ Claim gate & \path{docs/claims.json}, \path{scripts/run_claim_audit.py} \\
 \section{Claim Audit}
 \label{app:claim-audit}
 
-The repository claim file contains four claim families. Three are supported or partial with evidence files: adaptive elite-refit amplification, CEM underperforming static Best-of-$N$ in the controlled pocket world, and repair variants reducing controlled regret. The benchmark-scale PlaNet/Dreamer transfer claim is explicitly marked unsupported and is not promoted in the main text.
+The repository claim file contains four claim families. Three are supported or partial with evidence files: adaptive elite-refit amplification, CEM underperforming static-proposal baselines in the controlled pocket world, and repair variants reducing controlled regret. The benchmark-scale PlaNet/Dreamer transfer claim is explicitly marked unsupported and is not promoted in the main text.
 
 The audit command used for verification is:
 \begin{verbatim}

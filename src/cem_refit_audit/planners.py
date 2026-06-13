@@ -5,7 +5,7 @@ from typing import Callable
 
 import numpy as np
 
-from boncem.scoring import RepairConfig, ScoreBatch
+from cem_refit_audit.scoring import RepairConfig, ScoreBatch
 
 
 Array = np.ndarray
@@ -192,7 +192,7 @@ class RandomShootingPlanner:
         )
 
 
-class BestOfNPlanner:
+class StaticProposalPlanner:
     def __init__(self, config: PlannerConfig):
         self.config = config
 
@@ -212,7 +212,7 @@ class BestOfNPlanner:
         std = np.std(samples[elites], axis=0)
         trace = _trace(0, samples, scores, selected_idx, elites, mean, std, np.zeros_like(mean), utility_fn)
         return PlanResult(
-            planner="best_of_n",
+            planner="static_proposal",
             actions=samples[selected_idx],
             selected_score=float(scores.score[selected_idx]),
             selected_model_return=float(scores.model_return[selected_idx]),

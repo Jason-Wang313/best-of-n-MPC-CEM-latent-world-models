@@ -1,4 +1,4 @@
-from boncem.metrics import regret, selected_tail_gap
+from cem_refit_audit.metrics import regret, selected_tail_gap
 
 
 def test_regret_formula():

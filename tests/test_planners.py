@@ -1,7 +1,7 @@
 import numpy as np
 
-from boncem.planners import CEMPlanner, PlannerConfig
-from boncem.scoring import ScoreBatch
+from cem_refit_audit.planners import CEMPlanner, PlannerConfig
+from cem_refit_audit.scoring import ScoreBatch
 
 
 def score_prefers_negative(actions):

@@ -11,7 +11,7 @@
       ]
     },
     {
-      "id": "cem_can_underperform_static_best_of_n",
+      "id": "cem_can_underperform_static_proposal",
       "text": "In the controlled pocket world, vanilla CEM can produce worse true return than static non-adaptive proposals.",
       "status": "partial",
       "evidence": [

@@ -1,8 +1,8 @@
 import numpy as np
 
-from boncem.planners import CEMPlanner, PlannerConfig
-from boncem.scoring import ModelScorer, PilotCalibrator, RepairConfig
-from boncem.worlds import ToyWorld
+from cem_refit_audit.planners import CEMPlanner, PlannerConfig
+from cem_refit_audit.scoring import ModelScorer, PilotCalibrator, RepairConfig
+from cem_refit_audit.worlds import ToyWorld
 
 
 class GuardedToyWorld(ToyWorld):

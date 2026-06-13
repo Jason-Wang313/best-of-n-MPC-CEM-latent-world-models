@@ -10,7 +10,7 @@ Array = np.ndarray
 
 @dataclass(frozen=True)
 class RepairConfig:
-    """Model-only score corrections for CEM/Best-of-N planning."""
+    """Model-only score corrections for CEM/static proposal planning."""
 
     uncertainty_penalty: float = 0.0
     shadow_realism_penalty: float = 0.0

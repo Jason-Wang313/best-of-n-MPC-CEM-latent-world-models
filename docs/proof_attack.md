@@ -2,7 +2,7 @@
 
 ## Claim Under Attack
 
-The theorem candidate was initially too strong: "CEM worsens learned-model exploitation relative to Best-of-N." That does not survive.
+The theorem candidate was initially too strong: "CEM worsens learned-model exploitation relative to static proposal." That does not survive.
 
 The surviving claim is narrower:
 
@@ -19,7 +19,7 @@ The surviving claim is narrower:
 
 - If the true utility advantage outside the pocket dominates the model error, `Pr(L | P)` need not exceed `rho`; no pocket amplification follows.
 - If the pocket has high model uncertainty and the planner applies a strong penalty, the elite condition can underweight the pocket.
-- If a static equal-budget Best-of-N sample contains a fully optimized pocket trajectory, it can fail in the same way as CEM.
+- If an equal-budget static proposal sample contains a fully optimized pocket trajectory, it can fail in the same way as CEM.
 - If CEM initializes far from the pocket and never samples partial pocket trajectories, refit amplification is not triggered.
 
 ## Numerical Edge Checks

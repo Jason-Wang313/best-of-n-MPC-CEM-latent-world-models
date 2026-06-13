@@ -10,10 +10,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from boncem.metrics import estimate_true_optimum, summarize_rows
-from boncem.planners import CEMPlanner, PlannerConfig
-from boncem.scoring import ModelScorer, RepairConfig
-from boncem.worlds import ToyWorld
+from cem_refit_audit.metrics import estimate_true_optimum, summarize_rows
+from cem_refit_audit.planners import CEMPlanner, PlannerConfig
+from cem_refit_audit.scoring import ModelScorer, RepairConfig
+from cem_refit_audit.worlds import ToyWorld
 
 
 def main() -> None:

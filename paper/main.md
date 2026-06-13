@@ -6,7 +6,7 @@ PDF copy: `../PAPER.pdf`.
 
 ## Abstract
 
-Planning with learned world models often optimizes imagined rollouts using random shooting, Best-of-N, or CEM. This paper studies a specific failure mode: CEM can adaptively amplify model optimism because each elite refit changes the proposal distribution toward trajectories selected by the learned model. In controlled worlds with known sparse error pockets, we measure proposal drift, elite model-error concentration, tail optimism, and closed-loop regret. We compare uncertainty pessimism, diversity floors, disagreement vetoes, pilot calibration, conservative temperatures, and shadow-realism scoring. The current evidence supports a mechanism claim and motivates benchmark-scale validation.
+Planning with learned world models often optimizes imagined rollouts using random shooting, static proposal, or CEM. This paper studies a specific failure mode: CEM can adaptively amplify model optimism because each elite refit changes the proposal distribution toward trajectories selected by the learned model. In controlled worlds with known sparse error pockets, we measure proposal drift, elite model-error concentration, tail optimism, and closed-loop regret. We compare uncertainty pessimism, diversity floors, disagreement vetoes, pilot calibration, conservative temperatures, and shadow-realism scoring. The current evidence supports a mechanism claim and motivates benchmark-scale validation.
 
 ## 1. Introduction
 
@@ -16,7 +16,7 @@ This paper asks a narrower question: what does CEM's adaptive refit do when mode
 
 ## 2. Mechanism
 
-Best-of-N samples once from a fixed proposal and selects the highest-scoring imagined trajectory. CEM samples, selects elites, refits the proposal, and repeats. If model error helps trajectories enter the elite set, the refit can move the next proposal toward the error source.
+static proposal samples once from a fixed proposal and selects the highest-scoring imagined trajectory. CEM samples, selects elites, refits the proposal, and repeats. If model error helps trajectories enter the elite set, the refit can move the next proposal toward the error source.
 
 Diagnostics:
 
