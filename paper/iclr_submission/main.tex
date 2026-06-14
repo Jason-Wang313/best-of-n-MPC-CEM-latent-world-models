@@ -19,6 +19,7 @@
 \newcommand{\cem}{\textsc{CEM}}
 \newcommand{\pocket}{model-error pocket}
 \newcommand{\regret}{\mathrm{Regret}}
+\input{v3_results_macros.tex}
 
 \begin{document}
 \maketitle
@@ -158,6 +159,93 @@ Closed loop & combined repair over vanilla CEM & return $-2.55\rightarrow3.94$ \
 \label{fig:learned-sweep}
 \end{figure}
 
+\section{V3 Cached Evidence Audit}
+
+The v3 paper adds a cached audit layer over the full controlled run, the sparse
+learned-ensemble run, the sweep, and the closed-loop sanity check. The script
+\path{experiments/v3_cached_evidence.py} reads \VThreeControlledRows{}
+controlled rollout rows, \VThreeTraceRows{} CEM trace rows,
+\VThreeSweepRows{} sweep rows, \VThreeRepairGainRows{} repair-gain rows, and
+\VThreeLearnedRows{} learned-ensemble rollout rows. It writes compact CSV
+ledgers, five figures, a summary JSON file, and \LaTeX{} macros. This makes the
+paper's claim surface auditable without rerunning the full CPU experiments.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.86\linewidth]{figures/v3/v3_controlled_regret_rank.pdf}
+\caption{V3 controlled-run planner ranking. Vanilla CEM has substantially
+higher regret than static proposal baselines, while model-side repairs interrupt
+the elite-refit failure.}
+\label{fig:v3-rank}
+\end{figure}
+
+The controlled ranking makes the main failure explicit. Vanilla \cem{} has
+mean regret \VThreeCEMRegret{}, while the static-proposal baseline has
+\VThreeStaticRegret{} and the equal-budget static baseline has
+\VThreeEqualStaticRegret{}. The adaptive refit therefore costs
+\VThreeCEMMinusStatic{} regret points relative to one-shot static proposals in
+the controlled pocket world. The best repair has regret
+\VThreeBestRepairRegret{}, a \VThreeBestRepairGain{} point reduction from
+vanilla \cem{}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\linewidth]{figures/v3/v3_cem_trace_progression.pdf}
+\caption{CEM trace progression. As vanilla CEM refits to model-scored elites,
+selected tail gap and elite pocket mass rise with proposal drift.}
+\label{fig:v3-trace}
+\end{figure}
+
+Figure~\ref{fig:v3-trace} targets the mechanism rather than only final regret.
+Across vanilla \cem{} traces, selected tail gap rises from
+\VThreeTraceTailGapStart{} to \VThreeTraceTailGapEnd{} and elite pocket mass
+rises from \VThreeTracePocketStart{} to \VThreeTracePocketEnd{}. This is the
+empirical signature predicted by the elite-refit identity: model-scored elites
+are enriched for the error pocket, and the next proposal moves toward that
+selected tail.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.86\linewidth]{figures/v3/v3_sweep_repair_gain.pdf}
+\caption{Population/iteration sweep. The combined repair reduces regret most in
+settings where adaptive refits otherwise concentrate on the error pocket.}
+\label{fig:v3-sweep}
+\end{figure}
+
+The sweep ledger is a second stress test. Across population, iteration, elite
+fraction, and seed settings, vanilla \cem{} has mean regret
+\VThreeSweepCEMRegret{} and combined repair has
+\VThreeSweepRepairedRegret{}, for a mean reduction of \VThreeSweepGain{}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\linewidth]{figures/v3/v3_learned_closed_loop.pdf}
+\caption{Learned-ensemble and closed-loop checks. Calibration improves sparse
+learned CEM, and the combined repair improves short receding-horizon return.}
+\label{fig:v3-learned-closed}
+\end{figure}
+
+The learned-ensemble bridge is smaller but important. Vanilla learned \cem{}
+has regret \VThreeLearnedCEMRegret{}, while calibrated learned \cem{} has
+\VThreeLearnedCalibratedRegret{}, a \VThreeLearnedGain{} improvement. In the
+short closed-loop stress test, vanilla \cem{} has return
+\VThreeClosedLoopCEM{} and combined repair has \VThreeClosedLoopRepair{}, a
+\VThreeClosedLoopGain{} point gain.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.78\linewidth]{figures/v3/v3_tail_gap_vs_regret.pdf}
+\caption{Selected optimism versus regret. In the controlled run, selected tail
+gap is strongly correlated with regret, which supports the audit focus on
+selected-tail model optimism.}
+\label{fig:v3-gap-regret}
+\end{figure}
+
+Finally, selected tail gap and controlled regret have correlation
+\VThreeTailGapRegretCorr{} across the controlled rollout audit. This does not
+make tail gap a universal predictor in all environments, but it validates the
+paper's diagnostic target inside the controlled mechanism benchmark.
+
 \section{Repairs}
 
 The repair methods are intentionally simple and auditable. Uncertainty pessimism subtracts ensemble disagreement from the learned score. Model-disagreement veto removes candidates above a disagreement quantile. Pilot-label calibration fits a small optimism penalty using explicitly supplied pilot labels. Conservative refit temperature slows variance collapse. Elite diversity floors prevent all elites from becoming near-duplicates. Shadow-realism scoring penalizes trajectories that look out-of-support under simple support proxies.
@@ -179,6 +267,8 @@ The source package includes the ICLR LaTeX files, local style files, copied figu
 \bibliographystyle{iclr2026_conference}
 
 \appendix
+\setcounter{section}{0}
+\renewcommand{\thesection}{App.\arabic{section}}
 \input{appendix}
 
 \end{document}

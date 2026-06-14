@@ -1,0 +1,5 @@
+planner,label,regret,tail_gap
+learned_cem_calibrated,calibrated learned CEM,2.9645146065477843,-0.1774157695285897
+learned_static_proposal,learned static,3.1861549939601077,-0.8944592356867828
+learned_cem_uncertainty,uncertainty learned CEM,3.3544816529563923,0.2396680338484123
+learned_cem,learned CEM,4.6424933197453875,1.5992938937319794

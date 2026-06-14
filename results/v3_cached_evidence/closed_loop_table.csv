@@ -1,0 +1,4 @@
+planner,closed_loop_return,label
+cem_combined_repair,3.9433042059827685,combined repair
+static_proposal,0.5852251859495553,static proposal
+cem,-2.5517568843451808,vanilla CEM

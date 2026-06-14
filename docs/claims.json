@@ -5,27 +5,48 @@
       "text": "CEM can concentrate future samples into model-error pockets because each refit conditions on model-scored elites.",
       "status": "supported",
       "evidence": [
-        "results/smoke/controlled_summary.json",
-        "results/smoke/controlled_traces.csv",
-        "figures/smoke/elite_refit_drift.png"
+        "results/v3_cached_evidence/summary.json",
+        "results/v3_cached_evidence/cem_trace_progression.csv",
+        "results/v3_cached_evidence/v3_cem_trace_progression.pdf"
       ]
     },
     {
       "id": "cem_can_underperform_static_proposal",
       "text": "In the controlled pocket world, vanilla CEM can produce worse true return than static non-adaptive proposals.",
-      "status": "partial",
+      "status": "supported",
       "evidence": [
-        "results/smoke/controlled_rollouts.csv",
-        "figures/smoke/regret_bars.png"
+        "results/v3_cached_evidence/controlled_planner_table.csv",
+        "results/v3_cached_evidence/controlled_rollout_audit.csv",
+        "results/v3_cached_evidence/v3_controlled_regret_rank.pdf"
       ]
     },
     {
       "id": "repairs_reduce_controlled_regret",
       "text": "Model-only repair variants reduce controlled-world regret by penalizing or slowing concentration into uncertain/OOD elites.",
+      "status": "supported",
+      "evidence": [
+        "results/v3_cached_evidence/repair_gain_summary.csv",
+        "results/v3_cached_evidence/sweep_summary.csv",
+        "results/v3_cached_evidence/v3_sweep_repair_gain.pdf"
+      ]
+    },
+    {
+      "id": "sparse_learned_ensemble_bridge",
+      "text": "In a sparse learned-ensemble bridge experiment, calibrated learned CEM reduces regret relative to vanilla learned CEM.",
       "status": "partial",
       "evidence": [
-        "results/smoke/controlled_summary.json",
-        "figures/smoke/regret_bars.png"
+        "results/v3_cached_evidence/learned_planner_table.csv",
+        "results/v3_cached_evidence/learned_rollout_audit.csv",
+        "results/v3_cached_evidence/v3_learned_closed_loop.pdf"
+      ]
+    },
+    {
+      "id": "short_closed_loop_sanity",
+      "text": "In the short receding-horizon sanity check, combined repair improves return relative to vanilla CEM.",
+      "status": "partial",
+      "evidence": [
+        "results/v3_cached_evidence/closed_loop_table.csv",
+        "results/v3_cached_evidence/v3_learned_closed_loop.pdf"
       ]
     },
     {
