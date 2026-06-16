@@ -1,0 +1,22 @@
+{
+  "benchmark_count": 3,
+  "boundary_count": 1,
+  "cem_worse_than_best_static_count": 2,
+  "cem_worse_than_equal_static_count": 1,
+  "cliff_cem_regret": 1509.75,
+  "cliff_repair_regret": 0.0,
+  "curve_rows": 96,
+  "figures": [
+    "results\\v4_gymnasium_cem_cards\\v4_gymnasium_cem_cards.pdf",
+    "results\\v4_gymnasium_cem_cards\\v4_gymnasium_cem_traces.pdf"
+  ],
+  "frozen_cem_regret": 0.009653000050805268,
+  "paired_cem_worse_than_best_static": 6,
+  "paired_cem_worse_than_equal_static": 5,
+  "paired_repair_beats_cem": 8,
+  "record_rows": 48,
+  "repair_beats_cem_count": 2,
+  "seeds_per_benchmark": 4,
+  "taxi_cem_regret": 47.25,
+  "taxi_repair_regret": 0.0
+}

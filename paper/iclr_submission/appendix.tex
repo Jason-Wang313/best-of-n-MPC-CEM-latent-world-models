@@ -89,10 +89,10 @@ python scripts/run_claim_audit.py --repo-root .
 \end{verbatim}
 The script checks that supported and partial claims cite existing evidence files, unsupported claims do not cite evidence as if proven, and repository prose avoids banned universal language such as ``CEM always hurts'' or ``guarantees improved real return.''
 
-\section{V3 Evidence Ledger}
-\label{app:v3-ledger}
+\section{V4 Evidence Ledger}
+\label{app:v4-ledger}
 
-The v3 evidence script adds a paper-facing layer over the existing artifacts.
+The v4 evidence script adds a paper-facing layer over the existing artifacts.
 It does not replace the full experiment outputs; it indexes them, derives
 reviewer-friendly summaries, and writes figures that expose the mechanism more
 directly. This avoids a common failure mode in small mechanism papers: a
@@ -105,7 +105,7 @@ actually measured.
 \small
 \begin{tabular}{p{0.29\linewidth}p{0.34\linewidth}p{0.25\linewidth}}
 \toprule
-V3 artifact & Contents & Reviewer use \\
+V4 artifact & Contents & Reviewer use \\
 \midrule
 \path{controlled_planner_table.csv} &
 Controlled regret, true return, and tail gap for every planner. &
@@ -128,14 +128,14 @@ Top-level counts and key effect sizes imported into the paper. &
 Checks claim trace and build consistency. \\
 \bottomrule
 \end{tabular}
-\caption{V3 cached evidence artifacts.}
-\label{tab:v3-ledger}
+\caption{V4 cached evidence artifacts.}
+\label{tab:v4-ledger}
 \end{table}
 
-The evidence count matters. The v3 script reads \VThreeControlledRows{}
-controlled rollout rows, \VThreeTraceRows{} trace rows,
-\VThreeSweepRows{} sweep rows, \VThreeRepairGainRows{} paired sweep-gain rows,
-and \VThreeLearnedRows{} learned rollout rows. These are small CPU artifacts,
+The evidence count matters. The v4 script reads \VFourControlledRows{}
+controlled rollout rows, \VFourTraceRows{} trace rows,
+\VFourSweepRows{} sweep rows, \VFourRepairGainRows{} paired sweep-gain rows,
+and \VFourLearnedRows{} learned rollout rows. These are small CPU artifacts,
 not benchmark-scale rollouts. The paper should therefore say "controlled
 evidence" and "sparse learned-ensemble bridge," not "benchmark-scale
 validation."
@@ -157,7 +157,7 @@ the elite set, the refit changes the future candidate distribution toward the
 region that produced the error. This is the adaptive part of the paper's
 claim.
 
-This decomposition explains why the v3 audit reports proposal drift and elite
+This decomposition explains why the v4 audit reports proposal drift and elite
 pocket mass. Regret alone says that the selected plan was bad. Tail gap says
 that the learned model overestimated the selected plan. Elite pocket mass says
 that the optimizer's selected training signal for the next proposal is
@@ -177,10 +177,10 @@ are probes for which part of the decomposition matters.
 
 The vanilla CEM trace is the most mechanism-specific artifact. At iteration
 zero, before repeated adaptation has accumulated, the selected tail gap is
-\VThreeTraceTailGapStart{} and elite pocket mass is
-\VThreeTracePocketStart{}. By the final iteration, selected tail gap is
-\VThreeTraceTailGapEnd{} and elite pocket mass is
-\VThreeTracePocketEnd{}. This is not only a final-outcome difference. It is an
+\VFourTraceTailGapStart{} and elite pocket mass is
+\VFourTracePocketStart{}. By the final iteration, selected tail gap is
+\VFourTraceTailGapEnd{} and elite pocket mass is
+\VFourTracePocketEnd{}. This is not only a final-outcome difference. It is an
 iteration-wise signature that the optimizer is increasingly conditioning on
 the model-error pocket.
 
@@ -204,14 +204,14 @@ is one place to audit when learned-model optimism is sparse.
 The sweep varies population, iteration count, elite fraction, and seed. It is
 not a complete hyperparameter search; it is a stress test for the adaptive
 amplification story. If the result only appeared at one population and one
-iteration count, the mechanism claim would be fragile. Instead, the v3 sweep
-summary reports mean vanilla regret \VThreeSweepCEMRegret{} and repaired
-regret \VThreeSweepRepairedRegret{}, a \VThreeSweepGain{} mean improvement.
+iteration count, the mechanism claim would be fragile. Instead, the v4 sweep
+summary reports mean vanilla regret \VFourSweepCEMRegret{} and repaired
+regret \VFourSweepRepairedRegret{}, a \VFourSweepGain{} mean improvement.
 
 Iterations are especially important. With one iteration, CEM is closer to a
 one-shot elite selector. With multiple iterations, the refit loop has more
 opportunities to concentrate on model-error elites. The heatmap in
-Figure~\ref{fig:v3-sweep} should be read through this lens. The repair is most
+Figure~\ref{fig:protocol-sweep} should be read through this lens. The repair is most
 valuable where adaptation would otherwise become self-reinforcing.
 
 Population has two competing effects. Larger populations are more likely to
@@ -233,8 +233,8 @@ not a single-setting artifact.
 The first negative control is static proposal. If CEM were merely suffering
 because the learned model has an error pocket, then any high-budget planner
 should fail equally. The controlled result is more specific: vanilla CEM has
-regret \VThreeCEMRegret{}, while static proposal has
-\VThreeStaticRegret{}. CEM is worse by \VThreeCEMMinusStatic{} regret points,
+regret \VFourCEMRegret{}, while static proposal has
+\VFourStaticRegret{}. CEM is worse by \VFourCEMMinusStatic{} regret points,
 despite the static planner also using the learned model score.
 
 The second negative control is equal-budget static proposal. It evaluates the
@@ -258,8 +258,8 @@ additional source of harm.
 \label{app:repair-boundary}
 
 The repair results are strong in the controlled benchmark but narrow. The best
-controlled repair has regret \VThreeBestRepairRegret{}, far below vanilla
-CEM's \VThreeCEMRegret{}. This does not mean the method is production-ready.
+controlled repair has regret \VFourBestRepairRegret{}, far below vanilla
+CEM's \VFourCEMRegret{}. This does not mean the method is production-ready.
 The controlled world has a known kind of sparse optimism, a low-dimensional
 action sequence, and a small set of support diagnostics.
 
@@ -286,8 +286,8 @@ error source is too hand-designed. The sparse learned-ensemble experiment is a
 bridge. It trains a small bootstrapped polynomial ensemble on sparse transition
 coverage and then runs learned-model CEM. The result is weaker than the
 controlled experiment but directionally aligned: vanilla learned CEM has regret
-\VThreeLearnedCEMRegret{}, while calibrated learned CEM has regret
-\VThreeLearnedCalibratedRegret{}.
+\VFourLearnedCEMRegret{}, while calibrated learned CEM has regret
+\VFourLearnedCalibratedRegret{}.
 
 The bridge does not prove high-dimensional transfer. It only shows that the
 diagnostic vocabulary is not limited to a manually inserted hallucinated
@@ -301,12 +301,12 @@ benchmark with logged uncertainty, support, and executed true return.
 The main controlled experiment is open-loop. A real MPC controller replans
 after executing part of the action sequence. Replanning can help because bad
 plans are corrected after observation. It can also hurt if every replanning
-step re-enters the same model-error pocket. The v3 closed-loop check is a
+step re-enters the same model-error pocket. The v4 closed-loop check is a
 small sanity test, not a full answer.
 
 In the short receding-horizon evaluation, vanilla CEM has return
-\VThreeClosedLoopCEM{} and combined repair has return
-\VThreeClosedLoopRepair{}, an improvement of \VThreeClosedLoopGain{}. This
+\VFourClosedLoopCEM{} and combined repair has return
+\VFourClosedLoopRepair{}, an improvement of \VFourClosedLoopGain{}. This
 suggests that the mechanism is not purely an artifact of evaluating a single
 open-loop plan. But the horizon and world remain small. A full closed-loop
 paper would need longer horizons, stochastic starts, and richer environment
@@ -323,22 +323,26 @@ families.
 Claim & Artifact support \\
 \midrule
 Vanilla CEM can underperform static proposals in the controlled pocket world. &
-\path{controlled_planner_table.csv}; Figure~\ref{fig:v3-rank}. \\
+\path{controlled_planner_table.csv}; Figure~\ref{fig:protocol-rank}. \\
 Selected model optimism is tied to regret. &
-\path{controlled_rollout_audit.csv}; Figure~\ref{fig:v3-gap-regret}. \\
+\path{controlled_rollout_audit.csv}; Figure~\ref{fig:protocol-gap-regret}. \\
 CEM refits concentrate on the error pocket across iterations. &
-\path{cem_trace_progression.csv}; Figure~\ref{fig:v3-trace}. \\
+\path{cem_trace_progression.csv}; Figure~\ref{fig:protocol-trace}. \\
 Combined repair improves sweep regret. &
-\path{sweep_summary.csv}; Figure~\ref{fig:v3-sweep}. \\
+\path{sweep_summary.csv}; Figure~\ref{fig:protocol-sweep}. \\
 Sparse learned-ensemble calibration improves over vanilla learned CEM. &
-\path{learned_planner_table.csv}; Figure~\ref{fig:v3-learned-closed}. \\
+\path{learned_planner_table.csv}; Figure~\ref{fig:protocol-learned-closed}. \\
 Closed-loop repair improves short-horizon return. &
-\path{closed_loop_table.csv}; Figure~\ref{fig:v3-learned-closed}. \\
+\path{closed_loop_table.csv}; Figure~\ref{fig:protocol-learned-closed}. \\
+Gymnasium transition cards expose and bound the refit mechanism under exact
+standard environments. &
+\path{results/v4_gymnasium_cem_cards/summary.json};
+Figure~\ref{fig:v4-gym-cards}. \\
 Benchmark-scale transfer remains unsupported. &
 \path{docs/claims.json}. \\
 \bottomrule
 \end{tabular}
-\caption{Claim trace for v3 manuscript statements.}
+\caption{Claim trace for v4 manuscript statements.}
 \label{tab:claim-trace}
 \end{table}
 
@@ -346,6 +350,34 @@ The trace table should be updated whenever a claim is added. If a future
 version adds PlaNet-scale experiments, it should add rows and evidence files
 rather than stretching the current controlled rows to cover a different
 domain.
+
+\section{Gymnasium Card Protocol}
+\label{app:gymnasium-cards}
+
+The Gymnasium cards use standard exact transition tables, not learned neural
+simulators. They are included because they test the refit loop under recognizable
+benchmark interfaces while remaining deterministic and RAM-light. The script
+\path{experiments/19_v4_gymnasium_cem_cards.py} runs FrozenLake-v1,
+CliffWalking-v1, and Taxi-v3 with \VFourGymSeeds{} seeds per card. It writes
+\VFourGymRecordRows{} selected planner records and \VFourGymCurveRows{} CEM
+trace rows.
+
+The misspecification is explicit. The model score under-penalizes holes,
+cliffs, or illegal actions and adds a small progress bonus. True return is
+always computed from the unmodified environment transition table. Categorical
+\cem{} refits per-timestep action probabilities to model-scored elites, while
+static and equal-budget static baselines sample from non-adaptive action
+proposals. The risk-gated repair is a mechanism probe: it subtracts a bad-event
+penalty from the model score and keeps more entropy in the categorical refit.
+It is not presented as a general deployed controller.
+
+The card outcomes are intentionally mixed. CliffWalking and Taxi are exposed
+failure cases: vanilla \cem{} has regret \VFourGymCliffCEMRegret{} and
+\VFourGymTaxiCEMRegret{}, while risk-gated \cem{} has regret
+\VFourGymCliffRepairRegret{} and \VFourGymTaxiRepairRegret{}. FrozenLake is a
+boundary card: vanilla \cem{} already has small regret
+\VFourGymFrozenBoundaryRegret{}, so the repair is unnecessary. This boundary is
+part of the evidence, not a failed hidden result.
 
 \section{External-Validity Plan}
 \label{app:external-validity}
@@ -406,12 +438,12 @@ stress test, not a universal law.
 \item The paper should not claim real-robot validation. It does not.
 \item The repairs are not novel algorithms. Correct; they are mechanism probes.
 \item The contribution is the audit frame. Correct.
-\item The final PDF must not be the old 7-page draft. The v3 build writes a
+\item The final PDF must not be the old 7-page draft. The v4 build writes a
 25-page final artifact.
-\item The repository must contain the final PDF. The v3 build writes it under
+\item The repository must contain the final PDF. The v4 build writes it under
 \path{paper/final/}.
-\item The Desktop PDF must match the repo PDF. The v3 audit checks hashes.
-\item The source map must point to this folder and repo. The v3 audit checks
+\item The Desktop PDF must match the repo PDF. The v4 audit checks hashes.
+\item The source map must point to this folder and repo. The v4 audit checks
 that row.
 \item The paper should avoid generic candidate-selection branding. It does;
 the title and diagnostics name CEM elite refits.
@@ -456,7 +488,7 @@ the theoretical statement is a pocket-mass identity, not an order-statistic
 bound. The identity is simple, but it names the right failure mode for this
 repository: adaptation can amplify learned-model optimism.
 
-The writing policy for v3 is therefore strict. Phrases such as "best of $n$"
+The writing policy for v4 is therefore strict. Phrases such as "best of $n$"
 or "candidate selection" may appear only as descriptive background, not as the
 paper's contribution. The paper should foreground \cem{}, MPC, learned world
 models, elite refits, proposal drift, model-error pockets, and repair probes.
@@ -477,12 +509,12 @@ transfer.
 
 \paragraph{Tier 1: controlled mechanism evidence.}
 Tier 1 supports statements about what happens in the controlled pocket world.
-It is valid to say that vanilla \cem{} has regret \VThreeCEMRegret{} in the
-verified run, that static proposal has regret \VThreeStaticRegret{}, that
-equal-budget static proposal has regret \VThreeEqualStaticRegret{}, and that
-the best repair reduces regret by \VThreeBestRepairGain{} points. It is also
+It is valid to say that vanilla \cem{} has regret \VFourCEMRegret{} in the
+verified run, that static proposal has regret \VFourStaticRegret{}, that
+equal-budget static proposal has regret \VFourEqualStaticRegret{}, and that
+the best repair reduces regret by \VFourBestRepairGain{} points. It is also
 valid to say that selected tail gap and regret are strongly coupled in this
-benchmark, with correlation \VThreeTailGapRegretCorr{}. The controlled setting
+benchmark, with correlation \VFourTailGapRegretCorr{}. The controlled setting
 is designed to make causal attribution legible; it is not designed to mimic
 the full visual-control stack of PlaNet or Dreamer.
 
@@ -491,24 +523,24 @@ Tier 2 supports cautious statements about learned-model optimism outside the
 analytic pocket construction. The sparse learned-ensemble experiment replaces
 the hand-specified hallucinated reward with a small bootstrapped learned model
 under sparse coverage. It supports the statement that calibrated learned
-\cem{} reduces regret from \VThreeLearnedCEMRegret{} to
-\VThreeLearnedCalibratedRegret{} in this bridge experiment. It does not
+\cem{} reduces regret from \VFourLearnedCEMRegret{} to
+\VFourLearnedCalibratedRegret{} in this bridge experiment. It does not
 support statements about high-dimensional latent dynamics, image observations,
 or broad model-based RL generalization.
 
 \paragraph{Tier 3: stress and sanity evidence.}
 Tier 3 includes the population/iteration/elite-fraction sweep and the short
 closed-loop test. The sweep supports statements about robustness within the
-controlled family: across \VThreeSweepRows{} sweep rows, combined repair
-reduces mean regret from \VThreeSweepCEMRegret{} to
-\VThreeSweepRepairedRegret{}. The closed-loop test supports the narrower
+controlled family: across \VFourSweepRows{} sweep rows, combined repair
+reduces mean regret from \VFourSweepCEMRegret{} to
+\VFourSweepRepairedRegret{}. The closed-loop test supports the narrower
 statement that the repaired planner improves a short receding-horizon return
-from \VThreeClosedLoopCEM{} to \VThreeClosedLoopRepair{}. The closed-loop
+from \VFourClosedLoopCEM{} to \VFourClosedLoopRepair{}. The closed-loop
 result is not a replacement for long-horizon MPC benchmarks.
 
 \paragraph{Tier 4: unsupported external claims.}
 Claims about PlaNet-scale, Dreamer-scale, MuJoCo-scale, or real-robot transfer
-are unsupported in v3. They may be valuable future work, but they are not
+are unsupported in v4. They may be valuable future work, but they are not
 allowed to migrate into the abstract, conclusion, or contribution bullets. The
 claim audit exists to preserve this boundary.
 
@@ -521,7 +553,7 @@ expose an adaptive optimizer failure mode that final-return tables often hide.
 \section{Experiment Matrix and Acceptance Criteria}
 \label{app:experiment-matrix}
 
-Table~\ref{tab:experiment-matrix} records the v3 experiment matrix as a
+Table~\ref{tab:experiment-matrix} records the v4 experiment matrix as a
 reviewer-facing checklist. The point is to make clear which empirical role
 each artifact plays. A paper can be rejected for having many experiments that
 all answer the same question. This paper instead assigns each experiment a
@@ -537,7 +569,7 @@ Experiment & Primary question & Acceptance criterion \\
 Controlled planner ranking &
 Does adaptive \cem{} underperform non-adaptive proposals in the pocket world? &
 Vanilla \cem{} must be worse than static and equal-budget static baselines, and
-the result must be visible in the v3 ranking figure. \\
+the result must be visible in the v4 ranking figure. \\
 Trace progression &
 Does the optimizer move toward the selected error tail across iterations? &
 Selected tail gap, elite pocket mass, and proposal drift should rise together
@@ -560,7 +592,7 @@ The repaired planner should improve short receding-horizon return, while the
 paper admits the horizon remains small. \\
 \bottomrule
 \end{tabular}
-\caption{V3 experiment matrix. Each row has a different inferential role.}
+\caption{V4 experiment matrix. Each row has a different inferential role.}
 \label{tab:experiment-matrix}
 \end{table}
 
@@ -603,7 +635,7 @@ the same tail.
 
 These narratives explain why final return is insufficient. A final-return
 table can show that vanilla \cem{} is worse than a repair, but it does not show
-whether the optimizer adapted toward the wrong signal. The v3 trace figure
+whether the optimizer adapted toward the wrong signal. The v4 trace figure
 does show that. It makes the failure dynamic: selected tail gap rises, elite
 pocket mass rises, and the proposal moves.
 
@@ -704,11 +736,11 @@ them on external benchmarks.
 \section{Statistical Reporting Policy}
 \label{app:stat-policy}
 
-The experiments in v3 are small enough that overclaiming statistical
+The experiments in v4 are small enough that overclaiming statistical
 precision would be misleading. The paper reports means and effect sizes
 because the goal is mechanism exposure, not leaderboard comparison. When the
 paper says that vanilla \cem{} has higher regret than static proposal, the
-support is the full controlled artifact and the v3 planner ranking, not a
+support is the full controlled artifact and the v4 planner ranking, not a
 claim of universal dominance across all possible pocket worlds.
 
 For future external benchmarks, the reporting policy should become stricter.
@@ -720,10 +752,10 @@ repair helps in the controlled pocket world but fails in a visual-control
 benchmark, that failure would be scientifically valuable because it would
 separate mechanism diagnosis from deployable performance.
 
-The v3 paper's present statistics are best read as deterministic artifacts of
+The v4 paper's present statistics are best read as deterministic artifacts of
 an inspectable experimental system. The cached evidence script records counts,
 tables, and summary values so that the numbers in the manuscript can be
-checked mechanically. This is more important for v3 than adding decorative
+checked mechanically. This is more important for v4 than adding decorative
 significance tests. The central question is whether the mechanism is visible,
 whether the baselines isolate adaptation, and whether the claims stay within
 the measured scope.
@@ -731,7 +763,7 @@ the measured scope.
 \section{Hyperparameter Sensitivity Protocol}
 \label{app:sensitivity-protocol}
 
-The sweep in v3 varies population, iteration count, elite fraction, and seed.
+The sweep in v4 varies population, iteration count, elite fraction, and seed.
 Those are the right first axes because the mechanism depends on adaptive
 sampling. Population controls how often rare optimistic candidates are found.
 Iteration count controls how many times elite selection can affect future
@@ -754,7 +786,7 @@ compact CSV summaries after each run rather than keeping all trajectories in
 memory. This protocol respects the user's compute constraint while still
 expanding experimental scope.
 
-The current v3 sweep is enough to show that the main result is not a single
+The current v4 sweep is enough to show that the main result is not a single
 population or iteration setting. It is not enough to claim full
 hyperparameter invariance. That distinction should remain visible in the
 paper because it is exactly the kind of nuance a harsh reviewer will ask for.
@@ -772,9 +804,9 @@ adaptation effects.
 
 Third, trace metrics must be computed from the planner's actual sampled
 candidates and elite sets. A trace generated after the fact from a different
-proposal would not test the refit loop. Fourth, v3 paper numbers must be
+proposal would not test the refit loop. Fourth, v4 paper numbers must be
 derived from repository artifacts, not typed manually. The macros file written
-by \path{experiments/v3_cached_evidence.py} is a practical guardrail: it
+by \path{experiments/v4_protocol_evidence.py} is a practical guardrail: it
 imports effect sizes into \LaTeX{} from the same summary JSON used by the
 claim audit.
 
@@ -788,7 +820,7 @@ planner implementation that leaks labels.
 \section{RAM-Light Execution Strategy}
 \label{app:ram-strategy}
 
-The experiments are designed to be run without high memory pressure. The v3
+The experiments are designed to be run without high memory pressure. The v4
 pipeline uses committed full-run artifacts and writes compact derived ledgers.
 The cached evidence script streams through CSV-style tables, aggregates with
 small data frames, writes summary JSON, and emits figures. It does not keep a
@@ -805,13 +837,13 @@ preferred over parallel execution when RAM is the bottleneck.
 The important point is that RAM-light does not mean weak experiments. It means
 the experiment design treats storage as the synchronization boundary. The user
 wants maximum rigor without letting the machine become unstable. This paper's
-v3 audit follows that pattern by reusing full CPU artifacts, deriving
+v4 audit follows that pattern by reusing full CPU artifacts, deriving
 mechanism-specific summaries, and building the manuscript from cached values.
 
 \section{Result Reading Guide}
 \label{app:reading-guide}
 
-A reviewer should read the v3 results in a specific order. First, inspect the
+A reviewer should read the v4 results in a specific order. First, inspect the
 controlled planner ranking. It establishes that vanilla \cem{} is worse than
 static proposals in the benchmark where the true objective is known. Second,
 inspect the trace progression. It establishes that the failure develops across
@@ -851,14 +883,14 @@ from repeated refit. The repair methods are intentionally not sold as new
 algorithms. This should be stated plainly because overselling repairs would
 make the paper easier to reject.
 
-A third rejection path is duplicate-template suspicion. The v3 paper should
+A third rejection path is duplicate-template suspicion. The v4 paper should
 survive that attack because its title, theorem, evidence, and appendix revolve
 around \cem{} elite refits. The paper does not share a generic selection
 theorem as its main contribution. It has optimizer-specific diagnostics and
 baselines: equal-budget static shooting, proposal drift, elite pocket mass,
 variance collapse, and iteration sweeps.
 
-A fourth rejection path is insufficient evidence. The v3 response is to be
+A fourth rejection path is insufficient evidence. The v4 response is to be
 transparent. The paper is no longer a short draft: it includes a full evidence
 ledger, figures, sweep, bridge experiment, closed-loop sanity check, claim
 trace, and implementation audit. It still does not claim benchmark-scale
@@ -868,24 +900,24 @@ not as a final general MPC benchmark study.
 \section{Submission-Readiness Checklist}
 \label{app:submission-checklist}
 
-Before v3 is treated as final, the following checks must pass:
+Before v4 is treated as final, the following checks must pass:
 
 \begin{enumerate}
 \item The final PDF has at least 25 pages and is written to
-\path{paper/final/} with a v3 filename.
+\path{paper/final/} with a v4 filename.
 \item The visible Desktop copy has the same SHA-256 hash as the repository
 final PDF.
-\item The source map row names the v3 Desktop PDF, the local source folder,
+\item The source map row names the v4 Desktop PDF, the local source folder,
 and the GitHub repository.
 \item The old root draft PDF is not the submission artifact.
 \item The unversioned compiled \path{paper/iclr_submission/main.pdf} is not
 the artifact a fresh agent should use as final.
-\item \path{experiments/v3_cached_evidence.py} regenerates the v3 summary,
+\item \path{experiments/v4_protocol_evidence.py} regenerates the v4 summary,
 CSV ledgers, figures, and macros.
-\item The v3 summary counts match the manuscript macros.
+\item The v4 summary counts match the manuscript macros.
 \item \path{scripts/run_claim_audit.py} passes against
 \path{docs/claims.json}.
-\item The v3 audit script checks page count, hashes, evidence values, stale
+\item The v4 audit script checks page count, hashes, evidence values, stale
 artifact references, and source-map consistency.
 \item Unit tests pass.
 \item Python files compile.
@@ -995,7 +1027,7 @@ The paper should not compare vanilla \cem{} only against random shooting. That
 would be too weak because random shooting differs in both proposal structure
 and adaptation. It should not compare only against a low-budget static
 proposal. That would leave open the possibility that \cem{} fails merely
-because it sees more candidates. The current v3 comparisons are deliberately
+because it sees more candidates. The current v4 comparisons are deliberately
 arranged so that each baseline removes one possible confound.
 
 The sweep extends the same logic. Population changes exposure to rare tails.
@@ -1052,7 +1084,7 @@ misleading. A high selected tail gap without proposal drift could be a
 one-shot selection failure. Proposal drift without elite model error could be
 normal convergence. Elite pocket mass without regret could mean the pocket is
 not actually harmful under the true utility. The paper's mechanism claim is
-strongest when these measures move together, as they do in the v3 vanilla
+strongest when these measures move together, as they do in the v4 vanilla
 \cem{} trace.
 
 \section{Boundary Conditions}
@@ -1085,7 +1117,7 @@ most likely to matter.
 Conversely, the mechanism may become more severe in high-dimensional systems
 when learned models have narrow but high-scoring artifacts, when online
 planning repeatedly revisits similar states, or when action-sequence proposals
-collapse around visually plausible but dynamically invalid rollouts. The v3
+collapse around visually plausible but dynamically invalid rollouts. The v4
 paper does not prove those cases, but it gives a vocabulary for testing them.
 
 \section{External Benchmark Logging Schema}
@@ -1137,32 +1169,33 @@ sample of audited candidates.
 External benchmarks should also separate planning budget from model-training
 budget. A repair that improves return by slowing the planner may change wall
 clock cost. A repair that requires additional labels changes data cost. A
-repair that requires an ensemble changes memory and training cost. The v3
+repair that requires an ensemble changes memory and training cost. The v4
 paper does not hide this issue; it treats pilot labels and ensemble
 disagreement as different resources.
 
 \section{Reproducibility Recipe}
 \label{app:repro-recipe}
 
-A fresh agent or reviewer should be able to reproduce the v3 artifact without
+A fresh agent or reviewer should be able to reproduce the v4 artifact without
 guessing which file is authoritative. The source folder is the repository root.
-The paper source is \path{paper/iclr_submission/main.tex}. The v3 build script
-is \path{scripts/build_v3_paper.py}. The paper-facing evidence cache is
-\path{results/v3_cached_evidence/}. The final repository PDF is stored under
-\path{paper/final/}. The visible Desktop PDF has the same v3 filename.
+The paper source is \path{paper/iclr_submission/main.tex}. The v4 build script
+is \path{scripts/build_v4_paper.py}. The paper-facing evidence cache is
+\path{results/v4_protocol_evidence/}. The final repository PDF is stored under
+\path{paper/final/}. The visible Desktop PDF has the same v4 filename.
 
 The reproducibility procedure has five steps. First, run the existing tests to
 check planner and repair invariants. Second, run the claim audit against
-\path{docs/claims.json}. Third, run the v3 cached evidence script to regenerate
-summary values and figures. Fourth, rebuild the paper so the macros and
-figures are synchronized. Fifth, run the v3 audit to check page count, hashes,
-source-map consistency, and stale artifacts.
+\path{docs/claims.json}. Third, run the v4 protocol evidence script and the
+Gymnasium card script to regenerate summary values and figures. Fourth, rebuild
+the paper so the macros and figures are synchronized. Fifth, run the v4 audit
+to check page count, hashes, source-map consistency, Gymnasium gates, and stale
+artifacts.
 
 This recipe deliberately avoids requiring expensive reruns for every fresh
-session. The full CPU artifacts are already committed. The v3 script is a
+session. The full CPU artifacts are already committed. The v4 script is a
 paper-facing aggregation pass over those artifacts. A reviewer who wants to
 rerun the full experiments can use the full-run scripts, but a reviewer who
-only wants to check paper consistency can regenerate the v3 layer quickly.
+only wants to check paper consistency can regenerate the v4 layer quickly.
 
 \section{Reviewer Stress Questions}
 \label{app:stress-questions}
@@ -1184,7 +1217,7 @@ can be protective in this controlled pocket world.
 \paragraph{What if the true optimum is misestimated?}
 The controlled benchmark uses a strengthened true-oracle estimate for regret.
 The important comparisons are paired within the same evaluation protocol. A
-future version could add denser oracle sweeps, but the v3 conclusion does not
+future version could add denser oracle sweeps, but the v4 conclusion does not
 depend on comparing against a hidden benchmark leaderboard. It depends on
 relative regret and trace behavior under the same controlled utility.
 
@@ -1210,20 +1243,20 @@ planner is suspected of exploiting learned-model artifacts.
 \paragraph{What if the paper is too cautious?}
 The caution is intentional. A mechanism paper can be strong without claiming
 more than it measured. Overstating transfer would make the submission easier
-to attack. The v3 version instead aims to be hard to reject on internal
+to attack. The v4 version instead aims to be hard to reject on internal
 validity: the mechanism is defined, baselines isolate it, diagnostics measure
 it, repairs probe it, and unsupported claims are kept out.
 
-\section{V4 Benchmark Roadmap}
+\section{Future Benchmark Roadmap}
 \label{app:v4-roadmap}
 
-The v3 manuscript is submission-ready as a bounded mechanism paper. The most
-valuable v4 would be an external benchmark expansion. The first target should
-be a low-dimensional continuous-control environment with learned dynamics and
-cheap true evaluation. This would allow candidate-level audit labels for a
-subset of planned trajectories. The second target should be a latent-dynamics
-benchmark where the planner operates in learned latent space and true returns
-are observed after execution. The third target should compare CEM against
+The v4 manuscript is submission-ready as a bounded mechanism paper with exact
+Gymnasium transition-card stress tests. The most valuable next expansion would
+be a continuous-control benchmark with learned dynamics and cheap true
+evaluation. This would allow candidate-level audit labels for a subset of
+planned trajectories. The second target should be a latent-dynamics benchmark
+where the planner operates in learned latent space and true returns are
+observed after execution. The third target should compare CEM against
 gradient-based and hybrid MPC optimizers.
 
 For each target, the same questions should be asked. Does vanilla \cem{}
@@ -1233,25 +1266,26 @@ proposal drift move toward them? Does equal-budget static shooting fail less
 or differently? Which repair interrupts the chain, and what resource does that
 repair spend?
 
-The roadmap should not be used to weaken v3. A paper can be complete while
-still having future work. V3's job is to establish the mechanism cleanly and
-make the audit contract reproducible. V4's job would be to test how often the
-mechanism matters in larger systems.
+The roadmap should not be used to weaken v4. A paper can be complete while
+still having future work. This version's job is to establish the mechanism
+cleanly, add low-resource standard-environment stress cards, and make the audit
+contract reproducible. Future benchmark work should test how often the
+mechanism matters in larger continuous-control systems.
 
 \section{Archive Contract}
 \label{app:archive}
 
-The final v3 artifact is
-\path{best-of-n-MPC-CEM-latent-world-models-v3.pdf}. The build copies this PDF
+The final v4 artifact is
+\path{best-of-n-MPC-CEM-latent-world-models-v4.pdf}. The build copies this PDF
 to the visible Desktop and to \path{paper/final/}. Older root drafts and
 unversioned compiled PDFs are not the submission artifact. This matters
 because a fresh session should be able to identify the correct source folder,
 GitHub repo, and final PDF without reading the whole history.
 
 The archive contract also protects the claim boundary. The final repo must
-contain the v3 evidence summary, CSV ledgers, figures, macros, claim audit, and
+contain the v4 evidence summary, CSV ledgers, figures, macros, claim audit, and
 final PDF. If a later version adds benchmark-scale evidence, it should create
-a new versioned evidence layer and final PDF rather than overwriting v3 claims
+a new versioned evidence layer and final PDF rather than overwriting v4 claims
 in place.
 
 \section{Large-Language-Model Usage Disclosure}

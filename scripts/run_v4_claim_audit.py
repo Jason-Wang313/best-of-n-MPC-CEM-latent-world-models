@@ -9,29 +9,42 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DESKTOP = Path.home() / "OneDrive" / "Desktop"
-FINAL_NAME = "best-of-n-MPC-CEM-latent-world-models-v3.pdf"
+FINAL_NAME = "best-of-n-MPC-CEM-latent-world-models-v4.pdf"
+OLD_FINAL_NAME = "best-of-n-MPC-CEM-latent-world-models-v3.pdf"
 REPO_PDF = ROOT / "paper" / "final" / FINAL_NAME
 DESKTOP_PDF = DESKTOP / FINAL_NAME
+OLD_REPO_PDF = ROOT / "paper" / "final" / OLD_FINAL_NAME
+OLD_DESKTOP_PDF = DESKTOP / OLD_FINAL_NAME
 SOURCE_MAP = DESKTOP / "PAPER_SOURCE_MAP.md"
-SUMMARY = ROOT / "results" / "v3_cached_evidence" / "summary.json"
+SUMMARY = ROOT / "results" / "v4_protocol_evidence" / "summary.json"
+GYM_SUMMARY = ROOT / "results" / "v4_gymnasium_cem_cards" / "summary.json"
 LOG = ROOT / "paper" / "iclr_submission" / "main.log"
 
 
 EXPECTED_FILES = [
-    "results/v3_cached_evidence/controlled_planner_table.csv",
-    "results/v3_cached_evidence/learned_planner_table.csv",
-    "results/v3_cached_evidence/cem_trace_progression.csv",
-    "results/v3_cached_evidence/closed_loop_table.csv",
-    "results/v3_cached_evidence/sweep_summary.csv",
-    "results/v3_cached_evidence/repair_gain_summary.csv",
-    "results/v3_cached_evidence/controlled_rollout_audit.csv",
-    "results/v3_cached_evidence/learned_rollout_audit.csv",
-    "results/v3_cached_evidence/v3_controlled_regret_rank.pdf",
-    "results/v3_cached_evidence/v3_cem_trace_progression.pdf",
-    "results/v3_cached_evidence/v3_sweep_repair_gain.pdf",
-    "results/v3_cached_evidence/v3_learned_closed_loop.pdf",
-    "results/v3_cached_evidence/v3_tail_gap_vs_regret.pdf",
-    "paper/iclr_submission/v3_results_macros.tex",
+    "results/v4_protocol_evidence/controlled_planner_table.csv",
+    "results/v4_protocol_evidence/learned_planner_table.csv",
+    "results/v4_protocol_evidence/cem_trace_progression.csv",
+    "results/v4_protocol_evidence/closed_loop_table.csv",
+    "results/v4_protocol_evidence/sweep_summary.csv",
+    "results/v4_protocol_evidence/repair_gain_summary.csv",
+    "results/v4_protocol_evidence/controlled_rollout_audit.csv",
+    "results/v4_protocol_evidence/learned_rollout_audit.csv",
+    "results/v4_protocol_evidence/protocol_controlled_regret_rank.pdf",
+    "results/v4_protocol_evidence/protocol_cem_trace_progression.pdf",
+    "results/v4_protocol_evidence/protocol_sweep_repair_gain.pdf",
+    "results/v4_protocol_evidence/protocol_learned_closed_loop.pdf",
+    "results/v4_protocol_evidence/protocol_tail_gap_vs_regret.pdf",
+    "results/v4_gymnasium_cem_cards/candidate_records.csv",
+    "results/v4_gymnasium_cem_cards/selection_curves.csv",
+    "results/v4_gymnasium_cem_cards/benchmark_effects.csv",
+    "results/v4_gymnasium_cem_cards/summary.json",
+    "results/v4_gymnasium_cem_cards/v4_gymnasium_cem_cards.pdf",
+    "results/v4_gymnasium_cem_cards/v4_gymnasium_cem_traces.pdf",
+    "paper/iclr_submission/figures/v4/v4_gymnasium_cem_cards.pdf",
+    "paper/iclr_submission/figures/v4/v4_gymnasium_cem_traces.pdf",
+    "paper/iclr_submission/v4_results_macros.tex",
+    "paper/iclr_submission/v4_gymnasium_macros.tex",
 ]
 
 
@@ -128,6 +141,28 @@ def check_summary(errors: list[str]) -> None:
     require(data.get("best_repair_name") == "cem_pilot_calibrated", "unexpected best repair", errors)
 
 
+def check_gym_summary(errors: list[str]) -> None:
+    require(GYM_SUMMARY.exists(), f"missing {GYM_SUMMARY}", errors)
+    if not GYM_SUMMARY.exists():
+        return
+    data = json.loads(GYM_SUMMARY.read_text(encoding="utf-8"))
+    exact = {
+        "benchmark_count": 3,
+        "seeds_per_benchmark": 4,
+        "record_rows": 48,
+        "curve_rows": 96,
+        "cem_worse_than_best_static_count": 2,
+        "repair_beats_cem_count": 2,
+        "boundary_count": 1,
+    }
+    for key, expected in exact.items():
+        require(data.get(key) == expected, f"{key} expected {expected}, got {data.get(key)}", errors)
+    require(float(data.get("cliff_cem_regret", 0.0)) > 1000.0, "CliffWalking stress card no longer exposes CEM failure", errors)
+    require(float(data.get("cliff_repair_regret", 1.0)) <= 0.25, "CliffWalking repair gate regressed", errors)
+    require(float(data.get("taxi_cem_regret", 0.0)) > 30.0, "Taxi stress card no longer exposes CEM failure", errors)
+    require(float(data.get("taxi_repair_regret", 1.0)) <= 0.25, "Taxi repair gate regressed", errors)
+
+
 def check_log(errors: list[str]) -> None:
     require(LOG.exists(), f"missing LaTeX log {LOG}", errors)
     if not LOG.exists():
@@ -148,15 +183,16 @@ def check_source_map(errors: list[str]) -> None:
         f"| `{FINAL_NAME}` | `C:\\Users\\wangz\\best-of-n-MPC-CEM-latent-world-models` | "
         "`Jason-Wang313/best-of-n-MPC-CEM-latent-world-models` |"
     )
-    require(expected in text, "source map does not contain the v3 MPC-CEM row", errors)
+    require(expected in text, "source map does not contain the v4 MPC-CEM row", errors)
     require("best-of-n-MPC-CEM-latent-world-models-v2.pdf" not in text, "source map still references v2 MPC-CEM PDF", errors)
+    require("best-of-n-MPC-CEM-latent-world-models-v3.pdf" not in text, "source map still references v3 MPC-CEM PDF", errors)
 
 
 def main() -> None:
     errors: list[str] = []
 
     for rel in EXPECTED_FILES:
-        require((ROOT / rel).exists(), f"missing expected v3 artifact {rel}", errors)
+        require((ROOT / rel).exists(), f"missing expected v4 artifact {rel}", errors)
 
     require(REPO_PDF.exists(), f"missing repo final PDF {REPO_PDF}", errors)
     require(DESKTOP_PDF.exists(), f"missing Desktop final PDF {DESKTOP_PDF}", errors)
@@ -164,6 +200,8 @@ def main() -> None:
         require(pdf_pages(REPO_PDF) >= 25, f"repo final PDF has fewer than 25 pages", errors)
     if REPO_PDF.exists() and DESKTOP_PDF.exists():
         require(sha256(REPO_PDF) == sha256(DESKTOP_PDF), "repo and Desktop PDFs have different SHA-256 hashes", errors)
+    require(not OLD_REPO_PDF.exists(), f"old repo v3 PDF still exists: {OLD_REPO_PDF}", errors)
+    require(not OLD_DESKTOP_PDF.exists(), f"old Desktop v3 PDF still exists: {OLD_DESKTOP_PDF}", errors)
 
     tracked = git_ls_files()
     for rel in STALE_TRACKED:
@@ -172,6 +210,7 @@ def main() -> None:
         require(not (ROOT / rel).exists(), f"stale draft artifact still exists: {rel}", errors)
 
     check_summary(errors)
+    check_gym_summary(errors)
     check_log(errors)
     check_source_map(errors)
 
@@ -184,11 +223,11 @@ def main() -> None:
     require(claim_audit.returncode == 0, claim_audit.stderr.strip() or claim_audit.stdout.strip(), errors)
 
     if errors:
-        print("V3 claim audit failed:")
+        print("V4 claim audit failed:")
         for error in errors:
             print(f"- {error}")
         raise SystemExit(1)
-    print("V3 claim audit passed.")
+    print("V4 claim audit passed.")
 
 
 if __name__ == "__main__":

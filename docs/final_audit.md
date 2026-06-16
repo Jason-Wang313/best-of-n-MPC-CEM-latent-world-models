@@ -24,22 +24,30 @@ The strongest controlled repair result is the family of model-side veto/pessimis
 
 - The main benchmark is controlled and synthetic.
 - The sparse learned ensemble is still low-dimensional.
+- The Gymnasium transition cards are recognized benchmark interfaces but use
+  deliberately misspecified model rewards; they are stress cards, not
+  leaderboard-scale validation.
 - The theory is diagnostic rather than a regret guarantee.
 - Pilot calibration spends real labels and should be accounted for in any data-efficiency comparison.
 - High-dimensional latent planners may need better uncertainty and realism proxies.
 
-## 7. V3 Paper Status
+## 7. V4 Paper Status
 
-This is a submission-ready v3 bounded mechanism paper, not a broad benchmark paper. The v3 manuscript is 25 pages, writes a versioned final PDF to `paper/final/best-of-n-MPC-CEM-latent-world-models-v3.pdf`, and mirrors that PDF to the visible Desktop. The v3 cached evidence layer adds planner-ranking tables, trace progression, sweep repair-gain summaries, learned-ensemble ledgers, closed-loop summaries, five paper-facing figures, and LaTeX macros that keep the manuscript synchronized with repository artifacts.
+This is a submission-ready v4 bounded mechanism paper, not a broad benchmark paper. The v4 manuscript writes a versioned final PDF to `paper/final/best-of-n-MPC-CEM-latent-world-models-v4.pdf`, and mirrors that PDF to the visible Desktop. The v4 protocol evidence layer adds planner-ranking tables, trace progression, sweep repair-gain summaries, learned-ensemble ledgers, closed-loop summaries, five paper-facing figures, and LaTeX macros that keep the manuscript synchronized with repository artifacts.
+
+The v4 benchmark upgrade adds exact Gymnasium transition-table CEM cards for FrozenLake, CliffWalking, and Taxi. Vanilla categorical CEM is worse than the best non-adaptive static baseline on 2 of 3 cards; risk-gated CEM improves 2 of 3; FrozenLake is deliberately kept as the boundary card where the repair is unnecessary or conservative.
 
 The sparse learned-ensemble result remains a bridge rather than benchmark-scale transfer: vanilla learned CEM had regret `4.64`, while calibrated learned CEM had `2.96`. The next validation step is to port the diagnostics into a PlaNet/PETS-style continuous-control benchmark and test whether latent-space uncertainty or realism proxies reproduce the controlled repair behavior.
 
-## 8. V3 Acceptance Gates
+## 8. V4 Acceptance Gates
 
 - Final PDF is versioned and at least 25 pages.
 - Desktop PDF and repository PDF must have identical SHA-256 hashes.
-- `results/v3_cached_evidence/summary.json` must match the manuscript macros.
-- `docs/claims.json` must cite v3 evidence for supported or partial claims.
+- `results/v4_protocol_evidence/summary.json` must match the manuscript macros.
+- `results/v4_gymnasium_cem_cards/summary.json` must report 3 cards, 48
+  records, 96 curve rows, 2 CEM-worse cards, 2 repair-improved cards, and 1
+  boundary card.
+- `docs/claims.json` must cite v4 evidence for supported or partial claims.
 - Unsupported benchmark-scale transfer must remain unsupported.
 - Old root draft artifacts must not be treated as the final paper.
-- The source map must point to the v3 Desktop PDF, this local source folder, and the GitHub repository.
+- The source map must point to the v4 Desktop PDF, this local source folder, and the GitHub repository.

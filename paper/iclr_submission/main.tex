@@ -7,7 +7,8 @@
 \usepackage{amsthm}
 \usepackage{booktabs}
 \usepackage{graphicx}
-\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,citecolor=green!45!black,linkcolor=blue!55!black,urlcolor=blue!55!black]{hyperref}
 \usepackage{url}
 
 \title{CEM as an Adaptive Model-Error Amplifier\\in Learned World-Model MPC}
@@ -19,13 +20,14 @@
 \newcommand{\cem}{\textsc{CEM}}
 \newcommand{\pocket}{model-error pocket}
 \newcommand{\regret}{\mathrm{Regret}}
-\input{v3_results_macros.tex}
+\input{v4_results_macros.tex}
+\input{v4_gymnasium_macros.tex}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Model-predictive control with learned world models often optimizes imagined returns. Random shooting and static-proposal selection choose from a fixed proposal, while the cross-entropy method (\cem{}) repeatedly selects elite imagined rollouts and refits the proposal distribution. We study a narrow failure mode of that adaptation: when learned-model errors create optimistic sparse regions, elite refits can move future samples toward those regions, making model optimism self-reinforcing. We give a simple elite-refit identity showing when pocket mass increases, then test the mechanism in a controlled one-dimensional planning world with a known true optimum, a sparse learned-ensemble variant, and CEM population/iteration sweeps. In the verified full CPU run, vanilla \cem{} has mean controlled regret $11.64$ versus $6.16$ for a static-proposal baseline, while model-side repairs reduce regret to $0.22$--$0.30$ for the strongest variants. In the sparse learned-ensemble experiment, calibrated learned \cem{} reduces regret from $4.64$ to $2.96$. In sweeps, combined repair reduces mean \cem{} regret from $9.08$ to $2.33$, and short closed-loop return improves from $-2.55$ to $3.94$. These are controlled and synthetic mechanism results, not benchmark-scale or real-robot claims.
+Model-predictive control with learned world models often optimizes imagined returns. Random shooting and static-proposal selection choose from a fixed proposal, while the cross-entropy method (\cem{}) repeatedly selects elite imagined rollouts and refits the proposal distribution. We study a narrow failure mode of that adaptation: when learned-model errors create optimistic sparse regions, elite refits can move future samples toward those regions, making model optimism self-reinforcing. We give a simple elite-refit identity showing when pocket mass increases, then test the mechanism in a controlled one-dimensional planning world with a known true optimum, a sparse learned-ensemble variant, CEM population/iteration sweeps, and exact Gymnasium transition-table stress cards. In the verified full CPU run, vanilla \cem{} has mean controlled regret $11.64$ versus $6.16$ for a static-proposal baseline, while model-side repairs reduce regret to $0.22$--$0.30$ for the strongest variants. In \VFourGymBenchmarks{} standard Gymnasium cards, vanilla \cem{} is worse than the best non-adaptive static baseline on \VFourGymCEMWorseCount{} cards and a risk-gated repair improves \VFourGymRepairCount{} cards; FrozenLake is reported as a boundary case. These are mechanism and benchmark-stress results, not MuJoCo/PlaNet/Dreamer-scale transfer claims.
 \end{abstract}
 
 \section{Introduction}
@@ -38,7 +40,7 @@ Our central claim is deliberately bounded:
 \begin{quote}
 \emph{CEM with a learned model can be worse than a static one-shot proposal because each elite refit changes the proposal toward regions selected by model error, not necessarily real utility.}
 \end{quote}
-We make three contributions. First, we frame CEM's repeated elite refits as an adaptive model-error amplification mechanism. Second, we state a finite elite-refit identity that justifies measuring pocket occupancy, proposal drift, and elite model-error concentration. Third, we report controlled CPU evidence, sparse learned-ensemble evidence, and repair ablations that target the refit mechanism. We do not claim that CEM is generally bad, that uncertainty penalties are new, or that the result transfers to PlaNet/Dreamer-scale benchmarks without further validation.
+We make three contributions. First, we frame CEM's repeated elite refits as an adaptive model-error amplification mechanism. Second, we state a finite elite-refit identity that justifies measuring pocket occupancy, proposal drift, and elite model-error concentration. Third, we report controlled CPU evidence, sparse learned-ensemble evidence, exact Gymnasium stress cards, and repair ablations that target the refit mechanism. We do not claim that CEM is generally bad, that uncertainty penalties are new, or that the result transfers to PlaNet/Dreamer-scale benchmarks without further validation.
 
 \section{Related Work}
 
@@ -98,6 +100,9 @@ The second experiment trains a bootstrapped polynomial ensemble on transition da
 
 \paragraph{Sweeps and closed loop.}
 The sweep varies CEM population, iteration count, and elite fraction over 180 rows. A short receding-horizon evaluation executes the first action, observes the next state, and replans. These artifacts are small CPU experiments; they are intended to stress the mechanism, not to replace benchmark-scale MPC evaluation.
+
+\paragraph{Exact Gymnasium transition cards.}
+V4 adds low-resource Gymnasium \citep{towers2024gymnasium} stress cards on FrozenLake, CliffWalking, and Taxi. These are categorical CEM planners over exact transition tables with deliberately misspecified learned rewards: hazards and illegal actions are under-penalized by the model score, while the true expected return is computed from the unmodified environment transition table. The cards are standard-environment mechanism tests, not continuous-control leaderboard claims.
 
 \begin{table}[t]
 \caption{Main verified evidence. Regret is against the strengthened true-oracle estimate in the controlled world; lower is better. Closed-loop return is higher-is-better.}
@@ -159,92 +164,130 @@ Closed loop & combined repair over vanilla CEM & return $-2.55\rightarrow3.94$ \
 \label{fig:learned-sweep}
 \end{figure}
 
-\section{V3 Cached Evidence Audit}
+\section{V4 Cached Evidence Audit}
 
-The v3 paper adds a cached audit layer over the full controlled run, the sparse
+The v4 paper adds a cached audit layer over the full controlled run, the sparse
 learned-ensemble run, the sweep, and the closed-loop sanity check. The script
-\path{experiments/v3_cached_evidence.py} reads \VThreeControlledRows{}
-controlled rollout rows, \VThreeTraceRows{} CEM trace rows,
-\VThreeSweepRows{} sweep rows, \VThreeRepairGainRows{} repair-gain rows, and
-\VThreeLearnedRows{} learned-ensemble rollout rows. It writes compact CSV
+\path{experiments/v4_protocol_evidence.py} reads \VFourControlledRows{}
+controlled rollout rows, \VFourTraceRows{} CEM trace rows,
+\VFourSweepRows{} sweep rows, \VFourRepairGainRows{} repair-gain rows, and
+\VFourLearnedRows{} learned-ensemble rollout rows. It writes compact CSV
 ledgers, five figures, a summary JSON file, and \LaTeX{} macros. This makes the
 paper's claim surface auditable without rerunning the full CPU experiments.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.86\linewidth]{figures/v3/v3_controlled_regret_rank.pdf}
-\caption{V3 controlled-run planner ranking. Vanilla CEM has substantially
+\includegraphics[width=0.86\linewidth]{figures/protocol/protocol_controlled_regret_rank.pdf}
+\caption{V4 controlled-run planner ranking. Vanilla CEM has substantially
 higher regret than static proposal baselines, while model-side repairs interrupt
 the elite-refit failure.}
-\label{fig:v3-rank}
+\label{fig:protocol-rank}
 \end{figure}
 
 The controlled ranking makes the main failure explicit. Vanilla \cem{} has
-mean regret \VThreeCEMRegret{}, while the static-proposal baseline has
-\VThreeStaticRegret{} and the equal-budget static baseline has
-\VThreeEqualStaticRegret{}. The adaptive refit therefore costs
-\VThreeCEMMinusStatic{} regret points relative to one-shot static proposals in
+mean regret \VFourCEMRegret{}, while the static-proposal baseline has
+\VFourStaticRegret{} and the equal-budget static baseline has
+\VFourEqualStaticRegret{}. The adaptive refit therefore costs
+\VFourCEMMinusStatic{} regret points relative to one-shot static proposals in
 the controlled pocket world. The best repair has regret
-\VThreeBestRepairRegret{}, a \VThreeBestRepairGain{} point reduction from
+\VFourBestRepairRegret{}, a \VFourBestRepairGain{} point reduction from
 vanilla \cem{}.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.92\linewidth]{figures/v3/v3_cem_trace_progression.pdf}
+\includegraphics[width=0.92\linewidth]{figures/protocol/protocol_cem_trace_progression.pdf}
 \caption{CEM trace progression. As vanilla CEM refits to model-scored elites,
 selected tail gap and elite pocket mass rise with proposal drift.}
-\label{fig:v3-trace}
+\label{fig:protocol-trace}
 \end{figure}
 
-Figure~\ref{fig:v3-trace} targets the mechanism rather than only final regret.
+Figure~\ref{fig:protocol-trace} targets the mechanism rather than only final regret.
 Across vanilla \cem{} traces, selected tail gap rises from
-\VThreeTraceTailGapStart{} to \VThreeTraceTailGapEnd{} and elite pocket mass
-rises from \VThreeTracePocketStart{} to \VThreeTracePocketEnd{}. This is the
+\VFourTraceTailGapStart{} to \VFourTraceTailGapEnd{} and elite pocket mass
+rises from \VFourTracePocketStart{} to \VFourTracePocketEnd{}. This is the
 empirical signature predicted by the elite-refit identity: model-scored elites
 are enriched for the error pocket, and the next proposal moves toward that
 selected tail.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.86\linewidth]{figures/v3/v3_sweep_repair_gain.pdf}
+\includegraphics[width=0.86\linewidth]{figures/protocol/protocol_sweep_repair_gain.pdf}
 \caption{Population/iteration sweep. The combined repair reduces regret most in
 settings where adaptive refits otherwise concentrate on the error pocket.}
-\label{fig:v3-sweep}
+\label{fig:protocol-sweep}
 \end{figure}
 
 The sweep ledger is a second stress test. Across population, iteration, elite
 fraction, and seed settings, vanilla \cem{} has mean regret
-\VThreeSweepCEMRegret{} and combined repair has
-\VThreeSweepRepairedRegret{}, for a mean reduction of \VThreeSweepGain{}.
+\VFourSweepCEMRegret{} and combined repair has
+\VFourSweepRepairedRegret{}, for a mean reduction of \VFourSweepGain{}.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.92\linewidth]{figures/v3/v3_learned_closed_loop.pdf}
+\includegraphics[width=0.92\linewidth]{figures/protocol/protocol_learned_closed_loop.pdf}
 \caption{Learned-ensemble and closed-loop checks. Calibration improves sparse
 learned CEM, and the combined repair improves short receding-horizon return.}
-\label{fig:v3-learned-closed}
+\label{fig:protocol-learned-closed}
 \end{figure}
 
 The learned-ensemble bridge is smaller but important. Vanilla learned \cem{}
-has regret \VThreeLearnedCEMRegret{}, while calibrated learned \cem{} has
-\VThreeLearnedCalibratedRegret{}, a \VThreeLearnedGain{} improvement. In the
+has regret \VFourLearnedCEMRegret{}, while calibrated learned \cem{} has
+\VFourLearnedCalibratedRegret{}, a \VFourLearnedGain{} improvement. In the
 short closed-loop stress test, vanilla \cem{} has return
-\VThreeClosedLoopCEM{} and combined repair has \VThreeClosedLoopRepair{}, a
-\VThreeClosedLoopGain{} point gain.
+\VFourClosedLoopCEM{} and combined repair has \VFourClosedLoopRepair{}, a
+\VFourClosedLoopGain{} point gain.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.78\linewidth]{figures/v3/v3_tail_gap_vs_regret.pdf}
+\includegraphics[width=0.78\linewidth]{figures/protocol/protocol_tail_gap_vs_regret.pdf}
 \caption{Selected optimism versus regret. In the controlled run, selected tail
 gap is strongly correlated with regret, which supports the audit focus on
 selected-tail model optimism.}
-\label{fig:v3-gap-regret}
+\label{fig:protocol-gap-regret}
 \end{figure}
 
 Finally, selected tail gap and controlled regret have correlation
-\VThreeTailGapRegretCorr{} across the controlled rollout audit. This does not
+\VFourTailGapRegretCorr{} across the controlled rollout audit. This does not
 make tail gap a universal predictor in all environments, but it validates the
 paper's diagnostic target inside the controlled mechanism benchmark.
+
+\section{Standard Gymnasium CEM Cards}
+
+The v4 benchmark addition is deliberately scoped. We do not claim MuJoCo-scale
+or image-based latent planning transfer. Instead, we use exact Gymnasium
+transition tables as adversarial teachers: the model score under-penalizes
+hazards or illegal actions, categorical \cem{} refits action probabilities to
+model-scored elites, and the audit measures true expected return under the
+unmodified environment. This preserves the mechanism under a recognized
+benchmark interface while keeping CPU and memory use small.
+
+Across \VFourGymBenchmarks{} Gymnasium cards, \VFourGymRecordRows{} selected
+planner records, and \VFourGymCurveRows{} CEM trace rows, vanilla \cem{} is
+worse than the best non-adaptive static baseline on \VFourGymCEMWorseCount{}
+cards. Risk-gated \cem{} improves over vanilla \cem{} on
+\VFourGymRepairCount{} cards, with CliffWalking regret falling from
+\VFourGymCliffCEMRegret{} to \VFourGymCliffRepairRegret{} and Taxi regret
+falling from \VFourGymTaxiCEMRegret{} to \VFourGymTaxiRepairRegret{}. The
+FrozenLake card is intentionally reported as the boundary: vanilla \cem{} has
+small regret \VFourGymFrozenBoundaryRegret{}, and the repair is not needed.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.96\linewidth]{figures/v4/v4_gymnasium_cem_cards.pdf}
+\caption{Exact Gymnasium transition-table CEM cards. CliffWalking and Taxi
+expose the adaptive refit failure under hazard/illegal-action under-penalization,
+while FrozenLake is a boundary where vanilla CEM is already competitive.}
+\label{fig:v4-gym-cards}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.96\linewidth]{figures/v4/v4_gymnasium_cem_traces.pdf}
+\caption{CEM trace cards. The repair is not presented as a universal algorithm;
+it is a risk gate that interrupts the specific benchmark stress mechanism when
+the model score makes bad events attractive.}
+\label{fig:v4-gym-traces}
+\end{figure}
 
 \section{Repairs}
 
@@ -254,14 +297,37 @@ These repairs are mechanism probes, not deployable safety guarantees. Tests ensu
 
 \section{Limitations}
 
-The main benchmark is controlled and synthetic. The sparse learned-ensemble experiment is low-dimensional. The proposition is a diagnostic elite-refit identity, not a general regret guarantee. Equal-budget static proposals can also fail when they sample the bad pocket. The current evidence should therefore be read as a mechanism scaffold, not a completed benchmark paper. The next validation step is to port these diagnostics into PlaNet/PETS-style continuous-control benchmarks and test whether latent uncertainty, disagreement, and realism proxies produce the same repair pattern.
+The main controlled benchmark is synthetic, and the sparse learned-ensemble
+experiment is low-dimensional. The Gymnasium cards use recognized transition
+tables but deliberately misspecified model rewards; they are benchmark stress
+tests, not a claim of state-of-the-art control. The proposition is a diagnostic
+elite-refit identity, not a general regret guarantee. Equal-budget static
+proposals can also fail when they sample the bad pocket. The current evidence
+should therefore be read as a mechanism paper with external stress cards, not a
+completed MuJoCo, D4RL, or Dreamer-scale benchmark paper. The next validation
+step is to port these diagnostics into PlaNet/PETS-style continuous-control
+benchmarks and test whether latent uncertainty, disagreement, and realism
+proxies produce the same repair pattern.
 
 \section{Conclusion}
 
-CEM's strength is adaptation, but adaptation can also amplify the wrong signal. In learned world-model MPC, elite imagined rollouts may be elite because they are truly useful, because they exploit model error, or both. This repository shows a controlled setting where refitting to those elites concentrates search into model-error pockets and damages real return. The repair results suggest that slowing, vetoing, or calibrating uncertain elite concentration is a promising direction, while the final claim remains bounded to controlled CPU evidence.
+CEM's strength is adaptation, but adaptation can also amplify the wrong signal.
+In learned world-model MPC, elite imagined rollouts may be elite because they
+are truly useful, because they exploit model error, or both. This repository
+shows a controlled setting where refitting to those elites concentrates search
+into model-error pockets and damages real return, then checks the same refit
+logic on exact Gymnasium transition-table stress cards. The repair results
+suggest that slowing, vetoing, gating, or calibrating uncertain elite
+concentration is a promising direction, while the final claim remains bounded
+to mechanism and stress-card evidence.
 
 \section*{Reproducibility Statement}
-The source package includes the ICLR LaTeX files, local style files, copied figures, and the appendix artifact map. Repository claims are gated by \path{scripts/run_claim_audit.py --repo-root . --claim-file docs/claims.json}. All main empirical numbers are read from committed CSV/JSON artifacts under \path{results/}.
+The source package includes the ICLR LaTeX files, local style files, copied
+figures, and the appendix artifact map. The v4 build regenerates the protocol
+evidence, Gymnasium card evidence, bibliography, and final PDF from committed
+artifacts. Repository claims are checked against the claim registry, and all
+main empirical numbers are read from committed CSV/JSON artifacts under
+\path{results/}. The exact commands are listed in the appendix reproducibility recipe.
 
 \bibliography{references}
 \bibliographystyle{iclr2026_conference}

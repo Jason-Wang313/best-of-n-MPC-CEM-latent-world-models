@@ -10,9 +10,9 @@ import pandas as pd
 
 
 ROOT = Path(__file__).resolve().parents[1]
-RESULTS = ROOT / "results" / "v3_cached_evidence"
+RESULTS = ROOT / "results" / "v4_protocol_evidence"
 PAPER = ROOT / "paper" / "iclr_submission"
-FIGURES = PAPER / "figures" / "v3"
+FIGURES = PAPER / "figures" / "protocol"
 
 
 LABELS = {
@@ -159,7 +159,7 @@ def write_figures(tables: dict[str, pd.DataFrame]) -> list[Path]:
     axis.set_title("Controlled pocket-world planner ranking")
     axis.grid(axis="x", alpha=0.25)
     fig.tight_layout()
-    path = RESULTS / "v3_controlled_regret_rank.pdf"
+    path = RESULTS / "protocol_controlled_regret_rank.pdf"
     fig.savefig(path)
     plt.close(fig)
     paths.append(path)
@@ -177,7 +177,7 @@ def write_figures(tables: dict[str, pd.DataFrame]) -> list[Path]:
         axis.grid(alpha=0.25)
     axes[0].set_ylabel("mean value")
     fig.tight_layout()
-    path = RESULTS / "v3_cem_trace_progression.pdf"
+    path = RESULTS / "protocol_cem_trace_progression.pdf"
     fig.savefig(path)
     plt.close(fig)
     paths.append(path)
@@ -195,7 +195,7 @@ def write_figures(tables: dict[str, pd.DataFrame]) -> list[Path]:
     axis.set_title("Combined repair regret reduction")
     fig.colorbar(image, ax=axis, label="CEM regret - repaired regret")
     fig.tight_layout()
-    path = RESULTS / "v3_sweep_repair_gain.pdf"
+    path = RESULTS / "protocol_sweep_repair_gain.pdf"
     fig.savefig(path)
     plt.close(fig)
     paths.append(path)
@@ -212,7 +212,7 @@ def write_figures(tables: dict[str, pd.DataFrame]) -> list[Path]:
     axes[1].set_title("Receding-horizon sanity check")
     axes[1].grid(axis="x", alpha=0.25)
     fig.tight_layout()
-    path = RESULTS / "v3_learned_closed_loop.pdf"
+    path = RESULTS / "protocol_learned_closed_loop.pdf"
     fig.savefig(path)
     plt.close(fig)
     paths.append(path)
@@ -228,7 +228,7 @@ def write_figures(tables: dict[str, pd.DataFrame]) -> list[Path]:
     axis.grid(alpha=0.25)
     axis.legend(frameon=False, fontsize=7)
     fig.tight_layout()
-    path = RESULTS / "v3_tail_gap_vs_regret.pdf"
+    path = RESULTS / "protocol_tail_gap_vs_regret.pdf"
     fig.savefig(path)
     plt.close(fig)
     paths.append(path)
@@ -298,34 +298,34 @@ def write_macros(data: dict[str, pd.DataFrame | dict], tables: dict[str, pd.Data
     (RESULTS / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True), encoding="utf-8")
 
     text = ""
-    text += macro("VThreeControlledRows", f"{summary['controlled_rows']:,}")
-    text += macro("VThreeTraceRows", f"{summary['trace_rows']:,}")
-    text += macro("VThreeSweepRows", f"{summary['sweep_rows']:,}")
-    text += macro("VThreeRepairGainRows", f"{summary['repair_gain_rows']:,}")
-    text += macro("VThreeLearnedRows", f"{summary['learned_rows']:,}")
-    text += macro("VThreeCEMRegret", fmt(cem_regret))
-    text += macro("VThreeStaticRegret", fmt(static_regret))
-    text += macro("VThreeEqualStaticRegret", fmt(equal_static_regret))
-    text += macro("VThreeCEMMinusStatic", fmt(cem_regret - static_regret))
-    text += macro("VThreeBestRepairRegret", fmt(best_repair_regret))
-    text += macro("VThreeBestRepairGain", fmt(cem_regret - best_repair_regret))
-    text += macro("VThreeCEMTailGap", fmt(summary["cem_tail_gap"]))
-    text += macro("VThreeStaticTailGap", fmt(summary["static_tail_gap"]))
-    text += macro("VThreeLearnedCEMRegret", fmt(learned_cem))
-    text += macro("VThreeLearnedCalibratedRegret", fmt(learned_calibrated))
-    text += macro("VThreeLearnedGain", fmt(learned_cem - learned_calibrated))
-    text += macro("VThreeSweepCEMRegret", fmt(sweep_cem))
-    text += macro("VThreeSweepRepairedRegret", fmt(sweep_repaired))
-    text += macro("VThreeSweepGain", fmt(sweep_cem - sweep_repaired))
-    text += macro("VThreeClosedLoopCEM", fmt(closed_cem))
-    text += macro("VThreeClosedLoopRepair", fmt(closed_repair))
-    text += macro("VThreeClosedLoopGain", fmt(closed_repair - closed_cem))
-    text += macro("VThreeTraceTailGapStart", fmt(summary["trace_tail_gap_start"]))
-    text += macro("VThreeTraceTailGapEnd", fmt(summary["trace_tail_gap_end"]))
-    text += macro("VThreeTracePocketStart", fmt(summary["trace_pocket_start"], 3))
-    text += macro("VThreeTracePocketEnd", fmt(summary["trace_pocket_end"], 3))
-    text += macro("VThreeTailGapRegretCorr", fmt(tail_gap_corr, 2))
-    (PAPER / "v3_results_macros.tex").write_text(text, encoding="utf-8")
+    text += macro("VFourControlledRows", f"{summary['controlled_rows']:,}")
+    text += macro("VFourTraceRows", f"{summary['trace_rows']:,}")
+    text += macro("VFourSweepRows", f"{summary['sweep_rows']:,}")
+    text += macro("VFourRepairGainRows", f"{summary['repair_gain_rows']:,}")
+    text += macro("VFourLearnedRows", f"{summary['learned_rows']:,}")
+    text += macro("VFourCEMRegret", fmt(cem_regret))
+    text += macro("VFourStaticRegret", fmt(static_regret))
+    text += macro("VFourEqualStaticRegret", fmt(equal_static_regret))
+    text += macro("VFourCEMMinusStatic", fmt(cem_regret - static_regret))
+    text += macro("VFourBestRepairRegret", fmt(best_repair_regret))
+    text += macro("VFourBestRepairGain", fmt(cem_regret - best_repair_regret))
+    text += macro("VFourCEMTailGap", fmt(summary["cem_tail_gap"]))
+    text += macro("VFourStaticTailGap", fmt(summary["static_tail_gap"]))
+    text += macro("VFourLearnedCEMRegret", fmt(learned_cem))
+    text += macro("VFourLearnedCalibratedRegret", fmt(learned_calibrated))
+    text += macro("VFourLearnedGain", fmt(learned_cem - learned_calibrated))
+    text += macro("VFourSweepCEMRegret", fmt(sweep_cem))
+    text += macro("VFourSweepRepairedRegret", fmt(sweep_repaired))
+    text += macro("VFourSweepGain", fmt(sweep_cem - sweep_repaired))
+    text += macro("VFourClosedLoopCEM", fmt(closed_cem))
+    text += macro("VFourClosedLoopRepair", fmt(closed_repair))
+    text += macro("VFourClosedLoopGain", fmt(closed_repair - closed_cem))
+    text += macro("VFourTraceTailGapStart", fmt(summary["trace_tail_gap_start"]))
+    text += macro("VFourTraceTailGapEnd", fmt(summary["trace_tail_gap_end"]))
+    text += macro("VFourTracePocketStart", fmt(summary["trace_pocket_start"], 3))
+    text += macro("VFourTracePocketEnd", fmt(summary["trace_pocket_end"], 3))
+    text += macro("VFourTailGapRegretCorr", fmt(tail_gap_corr, 2))
+    (PAPER / "v4_results_macros.tex").write_text(text, encoding="utf-8")
     return summary
 
 
@@ -335,7 +335,7 @@ def main() -> None:
     tables = write_tables(data)
     figures = write_figures(tables)
     summary = write_macros(data, tables)
-    print(f"v3 cached evidence complete: {RESULTS}")
+    print(f"v4 cached evidence complete: {RESULTS}")
     print(f"controlled_rows={summary['controlled_rows']} sweep_rows={summary['sweep_rows']} figures={len(figures)}")
 
 

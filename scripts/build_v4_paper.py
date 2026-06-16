@@ -10,8 +10,10 @@ PAPER = ROOT / "paper" / "iclr_submission"
 DESKTOP = Path.home() / "OneDrive" / "Desktop"
 if not DESKTOP.exists():
     DESKTOP = Path.home() / "Desktop"
-DESKTOP_PDF = DESKTOP / "best-of-n-MPC-CEM-latent-world-models-v3.pdf"
-FINAL_PDF = ROOT / "paper" / "final" / "best-of-n-MPC-CEM-latent-world-models-v3.pdf"
+DESKTOP_PDF = DESKTOP / "best-of-n-MPC-CEM-latent-world-models-v4.pdf"
+FINAL_PDF = ROOT / "paper" / "final" / "best-of-n-MPC-CEM-latent-world-models-v4.pdf"
+OLD_DESKTOP_PDF = DESKTOP / "best-of-n-MPC-CEM-latent-world-models-v3.pdf"
+OLD_FINAL_PDF = ROOT / "paper" / "final" / "best-of-n-MPC-CEM-latent-world-models-v3.pdf"
 
 
 def run(command: list[str], cwd: Path) -> None:
@@ -38,12 +40,16 @@ def build_latex() -> Path:
 
 
 def main() -> None:
-    run(["python", str(ROOT / "experiments" / "v3_cached_evidence.py")], ROOT)
+    run(["python", str(ROOT / "experiments" / "v4_protocol_evidence.py")], ROOT)
+    run(["python", str(ROOT / "experiments" / "19_v4_gymnasium_cem_cards.py")], ROOT)
     pdf = build_latex()
     FINAL_PDF.parent.mkdir(parents=True, exist_ok=True)
     DESKTOP_PDF.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(pdf, FINAL_PDF)
     shutil.copy2(pdf, DESKTOP_PDF)
+    for old_pdf in (OLD_DESKTOP_PDF, OLD_FINAL_PDF):
+        if old_pdf.exists():
+            old_pdf.unlink()
     print(f"PDF: {DESKTOP_PDF}")
     print(f"Repo PDF: {FINAL_PDF}")
 
