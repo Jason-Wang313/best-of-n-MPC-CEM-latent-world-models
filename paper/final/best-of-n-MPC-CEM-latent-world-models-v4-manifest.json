@@ -1,0 +1,43 @@
+{
+  "paper": "best-of-n-MPC-CEM-latent-world-models-v4.pdf",
+  "source_folder": "C:\\Users\\wangz\\best-of-n-MPC-CEM-latent-world-models",
+  "github_remote": "https://github.com/Jason-Wang313/best-of-n-MPC-CEM-latent-world-models.git",
+  "repository_pdf": "paper/final/best-of-n-MPC-CEM-latent-world-models-v4.pdf",
+  "desktop_pdf": "C:\\Users\\wangz\\OneDrive\\Desktop\\best-of-n-MPC-CEM-latent-world-models-v4.pdf",
+  "sha256": "4AAF7DF7B94479B8F1F64980FC5CC187007F867F1D0915761F84A27FA1A01676",
+  "pages": 26,
+  "verified_on": "2026-06-18",
+  "checks": {
+    "compileall": "passed",
+    "pytest": "7 passed",
+    "protocol_evidence_regeneration": "controlled_rows=132 sweep_rows=360 figures=5",
+    "gymnasium_cem_cards": "benchmarks=3 rows=48 curves=96 cem_worse=2 repair=2 boundary=1",
+    "paper_build": "passed",
+    "claim_audit": "V4 claim audit passed.",
+    "latex_final_log_scan": "passed",
+    "repo_desktop_hash_match": true,
+    "pdf_render": "all 26 pages rendered",
+    "visual_qa": "pages 1, 5, 7, 8, 16, 24, and 26 inspected"
+  },
+  "evidence_summary": {
+    "controlled_rows": 132,
+    "trace_rows": 516,
+    "sweep_rows": 360,
+    "repair_gain_rows": 180,
+    "learned_rows": 24,
+    "cem_regret": 11.643942403147426,
+    "static_regret": 6.155914889904781,
+    "best_repair_name": "cem_pilot_calibrated",
+    "best_repair_regret": 0.2171658112041459,
+    "best_repair_gain": 11.42677659194328,
+    "sweep_gain": 6.75379287651055,
+    "closed_loop_gain": 6.495061090327949,
+    "tail_gap_regret_corr": 0.9874930533454624,
+    "gym_benchmark_count": 3,
+    "gym_record_rows": 48,
+    "gym_curve_rows": 96,
+    "gym_cem_worse_than_best_static_count": 2,
+    "gym_repair_beats_cem_count": 2,
+    "gym_boundary_count": 1
+  }
+}

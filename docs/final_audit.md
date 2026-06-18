@@ -51,3 +51,6 @@ The sparse learned-ensemble result remains a bridge rather than benchmark-scale 
 - Unsupported benchmark-scale transfer must remain unsupported.
 - Old root draft artifacts must not be treated as the final paper.
 - The source map must point to the v4 Desktop PDF, this local source folder, and the GitHub repository.
+- Final PDF SHA256:
+  `4AAF7DF7B94479B8F1F64980FC5CC187007F867F1D0915761F84A27FA1A01676`
+- Visual QA inspected rendered pages 1, 5, 7, 8, 16, 24, and 26.
