@@ -51,6 +51,11 @@ The sparse learned-ensemble result remains a bridge rather than benchmark-scale 
 - Unsupported benchmark-scale transfer must remain unsupported.
 - Old root draft artifacts must not be treated as the final paper.
 - The source map must point to the v4 Desktop PDF, this local source folder, and the GitHub repository.
+- Boxed-link PDF rebuild from frozen paper artifacts: passed.
 - Final PDF SHA256:
-  `4AAF7DF7B94479B8F1F64980FC5CC187007F867F1D0915761F84A27FA1A01676`
-- Visual QA inspected rendered pages 1, 5, 7, 8, 16, 24, and 26.
+  `3408E440AE6BFCE0EF97AB1C84515167B7D20B69BFB56CD5543D5D9A8B22E369`
+- PDF annotation audit found 49 link annotations: 38 green citation boxes and
+  11 red internal-reference boxes. All annotations use 1pt visible borders
+  matching the VLA role-model profile.
+- Visual QA inspected rendered pages 1, 2, 3, 4, 5, 7, 8, 12, 13, 16, 24, and
+  26.
